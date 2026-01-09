@@ -21,8 +21,7 @@ env/
 *.swo
 *~
 
-# 敏感配置文件 - 包含数据库凭据
-config/database.json
+
 
 # 规格工作流缓存
 .spec-workflow/
