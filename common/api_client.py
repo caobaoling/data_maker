@@ -20,9 +20,10 @@ def send_request_get(url, params):
 def send_request_post(url, params):
     """发送 HTTP POST 请求并返回响应"""
     try:
-        response = requests.post(url, params=params)
+        # 修复：使用 json= 而不是 params= 来发送POST body
+        response = requests.post(url, json=params)
         response.raise_for_status()  # 如果响应状态码不是 200，会抛出 HTTPError 异常
         return response.json()  # 假设响应内容是 JSON 格式
     except requests.exceptions.RequestException as e:
         print(f"请求失败: {e}")
-        return None
+        return {"code": "50000", "message": f"请求失败: {e}", "data": None}
