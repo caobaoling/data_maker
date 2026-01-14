@@ -46,9 +46,10 @@
             <el-menu-item index="/appoint/list" @click="handleMenuClick('/appoint/list', '预约列表')">
               预约列表
             </el-menu-item>
-            <el-menu-item index="/appoint/star" @click="handleMenuClick('/appoint/star', '预约打星')">
+            <!-- 暂时隐藏：功能需要优化 -->
+            <!-- <el-menu-item index="/appoint/star" @click="handleMenuClick('/appoint/star', '预约打星')">
               预约打星
-            </el-menu-item>
+            </el-menu-item> -->
           </el-sub-menu>
 
           <el-sub-menu index="elf" disabled>
@@ -65,11 +66,14 @@
             </template>
           </el-sub-menu>
 
-          <el-sub-menu index="redis" disabled>
+          <el-sub-menu index="redis">
             <template #title>
               <el-icon><Coin /></el-icon>
               <span>Redis工具</span>
             </template>
+            <el-menu-item index="/redis/tool" @click="handleMenuClick('/redis/tool', 'Redis工具')">
+              Redis管理
+            </el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>
@@ -102,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
 import { ElMessageBox } from 'element-plus'
@@ -113,9 +117,14 @@ const route = useRoute()
 const tabsStore = useTabsStore()
 
 const isCollapse = ref(false)
-const activeMenu = ref('/home')
+const activeMenu = ref(route.path)
 const sidebarWidth = computed(() => isCollapse.value ? '64px' : '200px')
 const visitedTabs = computed(() => tabsStore.visitedTabs)
+
+// 监听路由变化，自动同步菜单高亮
+watch(() => route.path, (newPath) => {
+  activeMenu.value = newPath
+}, { immediate: true })
 
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value
@@ -124,7 +133,6 @@ const toggleSidebar = () => {
 const handleMenuClick = (path, title) => {
   router.push(path)
   tabsStore.addTab({ path, title })
-  activeMenu.value = path
 }
 
 const isActive = (tab) => {

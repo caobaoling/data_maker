@@ -391,3 +391,95 @@ def update_appoint_status():
             'message': f'请求失败: {str(e)}',
             'data': None
         }), 500
+
+@appoint_bp.route('/add_star', methods=['POST'])
+def add_appoint_star():
+    """
+    给预约添加星星评价
+    """
+    try:
+        data = request.json
+        stu_id = data.get('stu_id')
+        appoint_id = data.get('appoint_id')
+        star_num = data.get('star_num', 5)
+
+        logger.info(f"[预约打星] 学生ID:{stu_id}, 预约ID:{appoint_id}, 星数:{star_num}")
+
+        if not stu_id or not appoint_id:
+            return jsonify({
+                'code': '40000',
+                'message': '学生ID和预约ID不能为空',
+                'data': None
+            }), 400
+
+        # 验证星数范围
+        if not (1 <= star_num <= 5):
+            return jsonify({
+                'code': '40000',
+                'message': '星数必须在1-5之间',
+                'data': None
+            }), 400
+
+        # 导入必需的模块
+        import time
+
+        # 生成时间戳
+        timestamp = int(time.time())
+
+        # 调用外部打星API
+        api_url = 'https://appi.51talkglobal.com/User/sendStar'
+        params = {
+            'biz_category': 'game_system',
+            'tsign': 'F72C2788F98F1555779C59FC4AF34D94',
+            'talk_token': 'bl%7CjnoQqt-nkHuy0pvsReULc0WZDgxh9SNxVuf7nCAQTtJ3IeGNvBsX1NDzU4x7TZCaDbaob7AdwCGbsUc6Fs5EZDX9%2FUM2CXmRf0RnP3A%3D',
+            'userId': stu_id,
+            'stu_id': stu_id,
+            'star_num': star_num,
+            'resolution': '2560_1600',
+            'physics_size': '10.8',
+            'device_mod': 'MRX-AL09&oaid=efd76ff9-f9e5-90e4-8dd7-dc9f7f5f209c',
+            'device_firm': 'HUAWEI',
+            'client_id': '86794e128dccc9646eb48883e7880655',
+            'appoint_id': appoint_id,
+            'appkey': 'junior_app',
+            'phoneType': 'andrKid',
+            'deviceType': 'HUAWEI_MRX-AL09',
+            'deviceId': '6281638E49D54D7384A70EEA736E1F88',
+            'systemVer': '31',
+            'channel': 'hicloud',
+            'version': '6.1.7',
+            'timestamp': timestamp,
+            'task_biz_category_list': 'elf_week_task,elf_month_task'
+        }
+
+        logger.info(f"[预约打星] 调用外部API: {api_url}")
+
+        # 发送请求
+        import requests
+        response = requests.get(api_url, params=params, timeout=10)
+
+        if response.status_code == 200:
+            result = response.json()
+            logger.info(f"[预约打星] 外部API响应: {json.dumps(result, ensure_ascii=False)}")
+
+            # 返回外部API的响应
+            return jsonify({
+                'code': '10000',
+                'message': '打星成功',
+                'data': result
+            })
+        else:
+            logger.error(f"[预约打星] 外部API请求失败: status={response.status_code}, response={response.text}")
+            return jsonify({
+                'code': '50000',
+                'message': f'打星请求失败: HTTP {response.status_code}',
+                'data': None
+            }), 500
+
+    except Exception as e:
+        logger.error(f"[预约打星] 异常: {str(e)}", exc_info=True)
+        return jsonify({
+            'code': '50000',
+            'message': f'请求失败: {str(e)}',
+            'data': None
+        }), 500

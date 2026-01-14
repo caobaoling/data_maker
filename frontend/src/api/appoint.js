@@ -35,3 +35,12 @@ export function updateAppointStatus(data) {
     data
   })
 }
+
+// 给预约打星
+export function addAppointStar(data) {
+  return request({
+    url: '/appoint/add_star',
+    method: 'post',
+    data
+  })
+}

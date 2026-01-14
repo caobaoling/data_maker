@@ -30,6 +30,12 @@ const routes = [
         name: 'AddStar',
         component: () => import('@/views/appoint/AddStar.vue'),
         meta: { title: '预约打星', icon: 'Star' }
+      },
+      {
+        path: '/redis/tool',
+        name: 'RedisTool',
+        component: () => import('@/views/redis/RedisTool.vue'),
+        meta: { title: 'Redis工具', icon: 'Coin' }
       }
     ]
   }
