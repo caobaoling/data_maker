@@ -58,9 +58,9 @@
         <el-divider content-position="left">课程信息</el-divider>
 
         <el-form-item label="课程性质">
-          <el-radio-group v-model="form.usePoint">
-            <el-radio label="buy">付费课(buy)</el-radio>
+          <el-radio-group v-model="form.usePoint" @change="onUsePointChange">
             <el-radio label="free">体验课(free)</el-radio>
+            <el-radio label="buy">付费课(buy)</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -124,6 +124,70 @@
         </el-form-item>
       </el-form>
     </el-card>
+
+    <!-- 预约结果回显 -->
+    <el-card v-if="appointResult" class="result-card" style="margin-top: 20px">
+      <template #header>
+        <div class="card-header">
+          <span>预约成功信息</span>
+          <el-tag type="success">已创建</el-tag>
+        </div>
+      </template>
+
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="预约ID">
+          <el-tag type="primary" size="large">{{ appointResult.appointId }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="课程类型">
+          <el-tag :type="appointResult.courseType === '31' ? 'warning' : 'success'">
+            {{ appointResult.courseType === '31' ? '普通话' : '英语' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="学生ID">
+          {{ appointResult.stuId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="教师ID">
+          {{ appointResult.teacherId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="开始时间">
+          {{ appointResult.startTime }}
+        </el-descriptions-item>
+        <el-descriptions-item label="结束时间">
+          {{ appointResult.endTime }}
+        </el-descriptions-item>
+        <el-descriptions-item label="课程性质">
+          <el-tag :type="appointResult.usePoint === 'buy' ? 'primary' : 'info'">
+            {{ appointResult.usePoint === 'buy' ? '付费课' : '体验课' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="点数类型">
+          {{ appointResult.pointType }}
+        </el-descriptions-item>
+        <el-descriptions-item label="时间编号">
+          {{ appointResult.dateTime }}
+        </el-descriptions-item>
+        <el-descriptions-item label="预约状态">
+          <el-tag :type="appointResult.status === 'on' ? 'success' : 'info'">
+            {{ appointResult.status === 'on' ? '正常' : '已取消' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="course_id" :span="2">
+          {{ appointResult.courseId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="course_top_id">
+          {{ appointResult.courseTopId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="course_sub_id">
+          {{ appointResult.courseSubId }}
+        </el-descriptions-item>
+        <el-descriptions-item v-if="appointResult.remark" label="备注" :span="2">
+          {{ appointResult.remark }}
+        </el-descriptions-item>
+        <el-descriptions-item label="创建时间" :span="2">
+          <el-tag type="info">{{ appointResult.createTime }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-card>
   </div>
 </template>
 
@@ -134,15 +198,18 @@ import { addAppointCn, addAppointEn } from '@/api/appoint'
 
 const loading = ref(false)
 
+// 预约结果数据
+const appointResult = ref(null)
+
 const form = ref({
-  courseType: '31',
+  courseType: '1',  // 默认英语课程
   stuId: '',
   teacherId: '',
   startTime: '',
-  usePoint: 'buy',
-  courseId: '1406031',
-  courseTopId: '1400011',
-  courseSubId: '1406021',
+  usePoint: 'buy',  // 默认付费课
+  courseId: '1166431',  // 英语付费课默认教材 H5 L1-U17-L8
+  courseTopId: '1161041',
+  courseSubId: '1163731',
   status: 'on',
   remark: ''
 })
@@ -175,8 +242,55 @@ const dateTime = computed(() => {
   return `${dateStr}_${timeNum}`
 })
 
+// 根据课程类型和课程性质更新教材ID
+const updateCourseIds = () => {
+  const courseType = form.value.courseType
+  const usePoint = form.value.usePoint
+
+  if (courseType === '1' && usePoint === 'buy') {
+    // 英语付费课 (H5 L1-U17-L8)
+    form.value.courseId = '1166431'
+    form.value.courseTopId = '1161041'
+    form.value.courseSubId = '1163731'
+  } else if (courseType === '1' && usePoint === 'free') {
+    // 英语体验课
+    form.value.courseId = '821221'
+    form.value.courseTopId = '822151'
+    form.value.courseSubId = '820171'
+  } else if (courseType === '31' && usePoint === 'buy') {
+    // 普通话付费课
+    form.value.courseId = '1406031'
+    form.value.courseTopId = '1400011'
+    form.value.courseSubId = '1406021'
+  } else if (courseType === '31' && usePoint === 'free') {
+    // 普通话体验课
+    form.value.courseId = '1399131'
+    form.value.courseTopId = '1399121'
+    form.value.courseSubId = '1398121'
+  }
+}
+
 const onCourseTypeChange = () => {
-  ElMessage.info('请根据课程类型填写对应的教师ID')
+  updateCourseIds()
+
+  const courseType = form.value.courseType
+  const usePoint = form.value.usePoint
+  const courseTypeName = courseType === '31' ? '普通话' : '英语'
+  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
+  const teacherIdHint = courseType === '31' ? '350012781' : '2821'
+
+  ElMessage.info(`已切换为${courseTypeName}${usePointName}教材，教师ID参考: ${teacherIdHint}`)
+}
+
+const onUsePointChange = () => {
+  updateCourseIds()
+
+  const courseType = form.value.courseType
+  const usePoint = form.value.usePoint
+  const courseTypeName = courseType === '31' ? '普通话' : '英语'
+  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
+
+  ElMessage.info(`已切换为${courseTypeName}${usePointName}教材`)
 }
 
 const previewJSON = () => {
@@ -229,7 +343,33 @@ const submitForm = async () => {
 
     if (result.code === '10000') {
       ElMessage.success('预约创建成功！')
-      resetForm()
+
+      // 保存预约结果用于回显
+      appointResult.value = {
+        appointId: result.res?.id || '未知',
+        courseType: form.value.courseType,
+        stuId: form.value.stuId,
+        teacherId: form.value.teacherId,
+        startTime: form.value.startTime,
+        endTime: endTime.value,
+        dateTime: dateTime.value,
+        usePoint: form.value.usePoint,
+        pointType: form.value.courseType === '31' ? 'pthpoint' : 'point',
+        status: form.value.status,
+        courseId: form.value.courseId,
+        courseTopId: form.value.courseTopId,
+        courseSubId: form.value.courseSubId,
+        remark: form.value.remark,
+        createTime: new Date().toLocaleString('zh-CN')
+      }
+
+      // 滚动到结果区域
+      setTimeout(() => {
+        const resultCard = document.querySelector('.result-card')
+        if (resultCard) {
+          resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
     } else {
       ElMessage.error(`创建失败: ${result.message}`)
     }
@@ -241,18 +381,22 @@ const submitForm = async () => {
 }
 
 const resetForm = () => {
+  // 清空表单
   form.value = {
-    courseType: '31',
+    courseType: '1',
     stuId: '',
     teacherId: '',
     startTime: '',
-    usePoint: 'buy',
-    courseId: '1001',
-    courseTopId: '100',
-    courseSubId: '10',
+    usePoint: 'buy',  // 默认付费课
+    courseId: '1166431',  // 英语付费课教材
+    courseTopId: '1161041',
+    courseSubId: '1163731',
     status: 'on',
     remark: ''
   }
+
+  // 清空预约结果
+  appointResult.value = null
 }
 </script>
 

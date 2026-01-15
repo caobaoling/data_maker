@@ -9,6 +9,7 @@ from common.api_client import send_request_get
 
 # 定义 API URL
 url = 'https://appi.51talkglobal.com/User/sendStar'
+# url = 'https://172.16.70.59/User/sendStar'
 stu_id = 1587401021
 appoint_id = 916929660
 

@@ -14,6 +14,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 # 导入API蓝图
 from api.appoint import appoint_bp
 from api.redis import redis_bp
+from api.ai_teacher import ai_teacher_bp
+from api.elf import elf_bp
 
 # 创建Flask应用
 app = Flask(__name__)
@@ -30,6 +32,8 @@ CORS(app, resources={
 # 注册API蓝图
 app.register_blueprint(appoint_bp, url_prefix='/api/appoint')
 app.register_blueprint(redis_bp, url_prefix='/api/redis')
+app.register_blueprint(ai_teacher_bp, url_prefix='/api/ai')
+app.register_blueprint(elf_bp, url_prefix='/api/elf')
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])

@@ -18,7 +18,7 @@ COPY common /app/common
 COPY config /app/config
 
 # 暴露端口
-EXPOSE 5000
+EXPOSE 5001
 
 # 设置环境变量
 ENV PYTHONPATH=/app/backend
@@ -27,4 +27,4 @@ ENV PYTHONUNBUFFERED=1
 
 # 启动命令 (使用gunicorn生产服务器)
 WORKDIR /app/backend
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5001", "app:app"]

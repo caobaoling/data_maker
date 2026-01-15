@@ -303,7 +303,8 @@ def get_appoint_list():
 @appoint_bp.route('/update_status', methods=['POST'])
 def update_appoint_status():
     """
-    修改预约状态
+    修改预约状态（调用外部接口）
+    参考 change_appoint_status.py
     """
     try:
         data = request.json
@@ -328,61 +329,30 @@ def update_appoint_status():
                 'data': None
             }), 400
 
-        # 连接数据库
-        import sys
-        import os
-        sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-        from common.db_connect import create_connection
+        # 生成时间戳
+        import time
+        stamp_time = int(time.time())
 
-        conn = create_connection()
-        if not conn:
-            return jsonify({
-                'code': '50000',
-                'message': '数据库连接失败',
-                'data': None
-            }), 500
+        # 组装外部API参数（按照 change_appoint_status.py 的格式）
+        api_params = {
+            'id': str(appoint_id),
+            'status': new_status,
+            'cancel_time': stamp_time,
+            'update_time': stamp_time
+        }
 
-        try:
-            cursor = conn.cursor()
+        logger.info(f"[状态变更] 向外部API发送参数: {json.dumps(api_params, ensure_ascii=False)}")
 
-            # 更新状态
-            update_sql = f"""
-                UPDATE talkplatform_appoint_reconstruction.appoint
-                SET status = '{new_status}'
-                WHERE id = {appoint_id}
-            """
-            cursor.execute(update_sql)
-            conn.commit()
+        # 调用外部API
+        result = send_request_post(
+            'http://172.16.16.97/talkplatform_appointone_consumer/v1/appoint/update',
+            api_params
+        )
 
-            affected_rows = cursor.rowcount
-            cursor.close()
-            conn.close()
+        logger.info(f"[状态变更] 外部API响应: {json.dumps(result, ensure_ascii=False)}")
 
-            if affected_rows > 0:
-                logger.info(f"[状态变更] 成功 - 预约ID:{appoint_id}, 新状态:{new_status}")
-                return jsonify({
-                    'code': '10000',
-                    'message': '状态修改成功',
-                    'data': {'id': appoint_id, 'status': new_status}
-                })
-            else:
-                logger.warning(f"[状态变更] 失败 - 预约ID:{appoint_id}不存在")
-                return jsonify({
-                    'code': '40000',
-                    'message': '预约记录不存在',
-                    'data': None
-                }), 404
-
-        except Exception as e:
-            logger.error(f"[状态变更] 数据库操作异常: {str(e)}", exc_info=True)
-            if conn:
-                conn.rollback()
-                conn.close()
-            return jsonify({
-                'code': '50000',
-                'message': f'数据库操作失败: {str(e)}',
-                'data': None
-            }), 500
+        # 直接返回外部API的响应
+        return jsonify(result)
 
     except Exception as e:
         logger.error(f"[状态变更] 异常: {str(e)}", exc_info=True)

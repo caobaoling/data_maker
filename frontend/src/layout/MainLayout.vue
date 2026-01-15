@@ -52,18 +52,46 @@
             </el-menu-item> -->
           </el-sub-menu>
 
-          <el-sub-menu index="elf" disabled>
+          <el-sub-menu index="elf">
             <template #title>
               <el-icon><Grid /></el-icon>
               <span>精灵系统</span>
             </template>
+            <el-menu-item index="/elf/add-star" @click="handleMenuClick('/elf/add-star', '添加星星')">
+              添加星星
+            </el-menu-item>
+            <el-menu-item index="/elf/change-level" @click="handleMenuClick('/elf/change-level', '修改等级')">
+              修改等级
+            </el-menu-item>
+            <!-- 暂时隐藏：精灵结课功能 -->
+            <!-- <el-menu-item index="/elf/end-class" @click="handleMenuClick('/elf/end-class', '精灵结课')">
+              精灵结课
+            </el-menu-item> -->
+            <el-menu-item index="/elf/query-task" @click="handleMenuClick('/elf/query-task', '查询任务')">
+              查询任务
+            </el-menu-item>
+            <el-menu-item index="/elf/del-task" @click="handleMenuClick('/elf/del-task', '删除任务')">
+              删除任务
+            </el-menu-item>
+            <el-menu-item index="/elf/manage-rank" @click="handleMenuClick('/elf/manage-rank', '管理排行榜')">
+              管理排行榜
+            </el-menu-item>
           </el-sub-menu>
 
-          <el-sub-menu index="ai" disabled>
+          <el-sub-menu index="ai">
             <template #title>
               <el-icon><User /></el-icon>
               <span>AI外教</span>
             </template>
+            <el-menu-item index="/ai/add-point" @click="handleMenuClick('/ai/add-point', '添加财富')">
+              添加财富
+            </el-menu-item>
+            <el-menu-item index="/ai/exchange-code" @click="handleMenuClick('/ai/exchange-code', '兑换码')">
+              兑换码
+            </el-menu-item>
+            <el-menu-item index="/ai/clear-plan" @click="handleMenuClick('/ai/clear-plan', '清空学习计划')">
+              清空学习计划
+            </el-menu-item>
           </el-sub-menu>
 
           <el-sub-menu index="redis">

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layout/MainLayout.vue'
 
+// AI外教路由
 const routes = [
   {
     path: '/',
@@ -36,6 +37,60 @@ const routes = [
         name: 'RedisTool',
         component: () => import('@/views/redis/RedisTool.vue'),
         meta: { title: 'Redis工具', icon: 'Coin' }
+      },
+      {
+        path: '/ai/add-point',
+        name: 'AddPoint',
+        component: () => import('@/views/aiTeacher/AddPoint.vue'),
+        meta: { title: '添加财富', icon: 'CoinFilled' }
+      },
+      {
+        path: '/ai/exchange-code',
+        name: 'ExchangeCode',
+        component: () => import('@/views/aiTeacher/ExchangeCode.vue'),
+        meta: { title: '兑换码', icon: 'Ticket' }
+      },
+      {
+        path: '/ai/clear-plan',
+        name: 'ClearPlan',
+        component: () => import('@/views/aiTeacher/ClearPlan.vue'),
+        meta: { title: '清空学习计划', icon: 'Delete' }
+      },
+      {
+        path: '/elf/add-star',
+        name: 'ElfAddStar',
+        component: () => import('@/views/elf/AddStar.vue'),
+        meta: { title: '添加星星', icon: 'Star' }
+      },
+      {
+        path: '/elf/change-level',
+        name: 'ElfChangeLevel',
+        component: () => import('@/views/elf/ChangeLevel.vue'),
+        meta: { title: '修改等级', icon: 'Trophy' }
+      },
+      {
+        path: '/elf/end-class',
+        name: 'ElfEndClass',
+        component: () => import('@/views/elf/EndClass.vue'),
+        meta: { title: '精灵结课', icon: 'Check' }
+      },
+      {
+        path: '/elf/query-task',
+        name: 'ElfQueryTask',
+        component: () => import('@/views/elf/QueryTask.vue'),
+        meta: { title: '查询任务', icon: 'Search' }
+      },
+      {
+        path: '/elf/del-task',
+        name: 'ElfDelTask',
+        component: () => import('@/views/elf/DelTask.vue'),
+        meta: { title: '删除任务', icon: 'Delete' }
+      },
+      {
+        path: '/elf/manage-rank',
+        name: 'ElfManageRank',
+        component: () => import('@/views/elf/ManageRank.vue'),
+        meta: { title: '管理排行榜', icon: 'Histogram' }
       }
     ]
   }

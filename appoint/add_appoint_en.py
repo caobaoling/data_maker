@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 url = 'http://172.16.16.97/talkplatform_appointone_consumer/v1/appoint/add'
 
 t_id = 2821   # 普通话老师=350012781，外教老师=2821
-stu_id = 1587397944
-start_time = "2025-12-10 18:30:00"
+stu_id = 1587393646
+start_time = "2026-01-13 18:30:00"
 status = "on"   #on的状态
 course_type = "1"  #1v1英语课=1，普通话=31
 point_type = "point"    #1v1英语课=point，普通话=pthpoint

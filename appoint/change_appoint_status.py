@@ -9,7 +9,7 @@ import json
 
 # 定义 API URL
 url = 'http://172.16.16.97/talkplatform_appointone_consumer/v1/appoint/update'
-appoint_id = "620668693"
+appoint_id = "577708964"
 # status = "cancel"
 # status = "s_absent"
 # status = "t_absent"
