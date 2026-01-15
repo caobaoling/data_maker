@@ -42,6 +42,7 @@
             placeholder="选择日期时间"
             format="YYYY-MM-DD HH:mm:ss"
             value-format="YYYY-MM-DD HH:mm:ss"
+            popper-class="custom-time-picker"
             :disabled-minutes="disabledMinutes"
             :disabled-seconds="disabledSeconds" />
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
@@ -376,7 +377,22 @@ const submitForm = async () => {
         }
       }, 100)
     } else {
-      ElMessage.error(`创建失败: ${result.message}`)
+      // 更详细的错误提示
+      let errorMsg = `创建失败: ${result.message || '未知错误'}`
+
+      if (result.code === '11000') {
+        errorMsg += '\n\n可能原因：\n' +
+          '1. 学生ID或教师ID不存在或状态异常\n' +
+          '2. 该时间段已有预约冲突\n' +
+          '3. 学生没有该课程的学习权限\n' +
+          '4. 教材ID配置错误\n\n' +
+          '💡 建议：先使用普通话课程测试（教师ID: 350012781）'
+      }
+
+      ElMessageBox.alert(errorMsg, '预约创建失败', {
+        confirmButtonText: '知道了',
+        type: 'error'
+      })
     }
   } catch (error) {
     ElMessage.error(`请求失败: ${error.message}`)
@@ -405,8 +421,8 @@ const resetForm = () => {
 }
 
 // 时间选择器：禁用分钟（只允许00和30）
-const disabledMinutes = () => {
-  // 返回要禁用的分钟数组（0-59），保留0和30，禁用其他所有分钟
+const disabledMinutes = (hour) => {
+  // Element Plus 会传入当前选中的小时，返回要禁用的分钟数组
   const disabled = []
   for (let i = 0; i < 60; i++) {
     if (i !== 0 && i !== 30) {
@@ -417,8 +433,8 @@ const disabledMinutes = () => {
 }
 
 // 时间选择器：禁用秒钟（统一为00秒）
-const disabledSeconds = () => {
-  // 禁用所有非0的秒数（1-59）
+const disabledSeconds = (hour, minute) => {
+  // Element Plus 会传入当前选中的小时和分钟，返回要禁用的秒数组
   const disabled = []
   for (let i = 1; i < 60; i++) {
     disabled.push(i)
@@ -436,5 +452,17 @@ const disabledSeconds = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+</style>
+
+<style>
+/* 全局样式：隐藏自定义时间选择器中被禁用的选项 */
+.custom-time-picker .el-time-spinner__item.is-disabled {
+  display: none !important;
+}
+
+/* 备用方案：针对所有时间选择器 */
+.el-picker__popper .el-time-spinner__item.is-disabled {
+  display: none !important;
 }
 </style>

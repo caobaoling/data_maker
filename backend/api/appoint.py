@@ -118,9 +118,9 @@ def add_appoint_en():
         minute = start_dt.minute
         time_num = hour * 2 + (2 if minute >= 30 else 1)
 
-        # 计算 category（英语课用 en_ 前缀）
+        # 计算 category（注意：英语课也用 ph_ 前缀，参考原始脚本 add_appoint_en.py:56）
         use_point = data.get('use_point', 'buy')
-        category = f"en_{use_point}"
+        category = f"ph_{use_point}"
 
         # 组装完整的API参数（按照原始脚本的格式）
         params = {
