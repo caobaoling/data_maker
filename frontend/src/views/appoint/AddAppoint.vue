@@ -41,7 +41,12 @@
             type="datetime"
             placeholder="选择日期时间"
             format="YYYY-MM-DD HH:mm:ss"
-            value-format="YYYY-MM-DD HH:mm:ss" />
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :disabled-minutes="disabledMinutes"
+            :disabled-seconds="disabledSeconds" />
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            💡 时间只能选择整点（00:00）或半点（30:00）
+          </div>
         </el-form-item>
 
         <el-form-item label="结束时间">
@@ -397,6 +402,28 @@ const resetForm = () => {
 
   // 清空预约结果
   appointResult.value = null
+}
+
+// 时间选择器：禁用分钟（只允许00和30）
+const disabledMinutes = () => {
+  // 返回要禁用的分钟数组（0-59），保留0和30，禁用其他所有分钟
+  const disabled = []
+  for (let i = 0; i < 60; i++) {
+    if (i !== 0 && i !== 30) {
+      disabled.push(i)
+    }
+  }
+  return disabled
+}
+
+// 时间选择器：禁用秒钟（统一为00秒）
+const disabledSeconds = () => {
+  // 禁用所有非0的秒数（1-59）
+  const disabled = []
+  for (let i = 1; i < 60; i++) {
+    disabled.push(i)
+  }
+  return disabled
 }
 </script>
 
