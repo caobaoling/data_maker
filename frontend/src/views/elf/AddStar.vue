@@ -3,7 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>添加星星</span>
+          <span><strong>测试环境</strong>添加星星</span>
           <el-tag type="warning">为课程预约添加星星评分</el-tag>
         </div>
       </template>

@@ -3,8 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>清空学习计划</span>
-          <el-tag type="danger">⚠️ 危险操作</el-tag>
+          <span><strong>测试环境</strong>清空学习计划</span>
         </div>
       </template>
 
@@ -14,7 +13,7 @@
           <strong>🚨 危险操作警告</strong>
         </template>
         <ul style="margin: 10px 0; padding-left: 20px">
-          <li><strong>此操作将删除用户的所有AI外教学习计划数据</strong></li>
+          <li><strong>此操作将删除测试环境用户的所有AI外教学习计划数据</strong></li>
           <li>包含12个数据表的用户数据（学习记录、考试信息、统计数据等）</li>
           <li><strong style="color: #f56c6c">删除后无法恢复</strong></li>
           <li>请务必确认用户ID正确后再执行</li>

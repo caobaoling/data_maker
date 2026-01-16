@@ -3,7 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>使用兑换码</span>
+          <span><strong>测试环境</strong>使用兑换码</span>
           <el-tag type="warning">为用户兑换AI外教权益</el-tag>
         </div>
       </template>

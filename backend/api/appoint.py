@@ -189,6 +189,7 @@ def get_appoint_list():
         # 获取查询参数
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('pageSize', 20))
+        appoint_id = request.args.get('appointId', '')
         stu_id = request.args.get('stuId', '')
         t_id = request.args.get('tId', '')
         status = request.args.get('status', '')
@@ -197,10 +198,12 @@ def get_appoint_list():
         start_date = request.args.get('startDate', '')
         end_date = request.args.get('endDate', '')
 
-        logger.info(f"[预约列表] 查询参数 - page:{page}, pageSize:{page_size}, stuId:{stu_id}, tId:{t_id}, category:{category}")
+        logger.info(f"[预约列表] 查询参数 - page:{page}, pageSize:{page_size}, appointId:{appoint_id}, stuId:{stu_id}, tId:{t_id}, category:{category}")
 
         # 构建查询条件
         conditions = []
+        if appoint_id:
+            conditions.append(f"id = '{appoint_id}'")
         if stu_id:
             conditions.append(f"s_id = {stu_id}")
         if t_id:

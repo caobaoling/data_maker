@@ -2,12 +2,15 @@
   <div class="appoint-list-page">
     <el-card>
       <template #header>
-        <span>预约列表管理</span>
+        <span><strong>测试环境</strong>预约列表管理</span>
       </template>
 
       <!-- 查询工具栏 -->
       <div class="search-bar">
         <el-form :inline="true" :model="searchForm">
+          <el-form-item label="预约ID">
+            <el-input v-model="searchForm.appointId" placeholder="请输入预约ID" clearable style="width: 160px" />
+          </el-form-item>
           <el-form-item label="学生ID">
             <el-input v-model="searchForm.stuId" placeholder="请输入学生ID" clearable style="width: 160px" />
           </el-form-item>
@@ -202,6 +205,7 @@ const detailVisible = ref(false)
 const currentRow = ref(null)
 
 const searchForm = ref({
+  appointId: '',
   stuId: '',
   tId: '',
   courseType: '',
@@ -285,6 +289,7 @@ const loadData = async () => {
     const params = {
       page: pagination.value.page,
       pageSize: pagination.value.pageSize,
+      appointId: searchForm.value.appointId,
       stuId: searchForm.value.stuId,
       tId: searchForm.value.tId,
       courseType: searchForm.value.courseType,
@@ -317,6 +322,7 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.value = {
+    appointId: '',
     stuId: '',
     tId: '',
     courseType: '',

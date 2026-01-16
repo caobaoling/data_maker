@@ -3,7 +3,7 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>添加课程预约</span>
+          <span><strong>测试环境</strong>添加课程预约</span>
           <el-button text @click="resetForm">重置表单</el-button>
         </div>
       </template>

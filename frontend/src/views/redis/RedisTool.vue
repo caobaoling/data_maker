@@ -3,7 +3,7 @@
     <!-- 顶部节点选择栏 -->
     <el-card class="header-card">
       <div class="node-selection">
-        <div class="node-title">Redis节点选择：</div>
+        <div class="node-title"><strong>测试环境 </strong>Redis节点选择：</div>
         <el-checkbox-group v-model="selectedNodeIndexes" @change="handleNodeSelectionChange">
           <el-checkbox
             v-for="(node, index) in redisNodes"

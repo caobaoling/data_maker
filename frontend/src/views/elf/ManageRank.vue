@@ -3,7 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>管理排行榜</span>
+          <span><strong>测试环境</strong>管理排行榜</span>
           <el-tag type="warning">清理上周数据并重置状态</el-tag>
         </div>
       </template>

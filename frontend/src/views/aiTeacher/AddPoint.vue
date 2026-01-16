@@ -3,7 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>添加AI财富</span>
+          <span><strong>测试环境</strong>添加AI财富</span>
           <el-tag type="info">为用户添加AI外教点数</el-tag>
         </div>
       </template>

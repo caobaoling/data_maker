@@ -74,12 +74,13 @@ const routes = [
         component: () => import('@/views/elf/EndClass.vue'),
         meta: { title: '精灵结课', icon: 'Check' }
       },
-      {
-        path: '/elf/query-task',
-        name: 'ElfQueryTask',
-        component: () => import('@/views/elf/QueryTask.vue'),
-        meta: { title: '查询任务', icon: 'Search' }
-      },
+      // 查询任务功能暂时隐藏 - 接口有问题
+      // {
+      //   path: '/elf/query-task',
+      //   name: 'ElfQueryTask',
+      //   component: () => import('@/views/elf/QueryTask.vue'),
+      //   meta: { title: '查询任务', icon: 'Search' }
+      // },
       {
         path: '/elf/del-task',
         name: 'ElfDelTask',
@@ -91,6 +92,12 @@ const routes = [
         name: 'ElfManageRank',
         component: () => import('@/views/elf/ManageRank.vue'),
         meta: { title: '管理排行榜', icon: 'Histogram' }
+      },
+      {
+        path: '/picturebook/clear-plan',
+        name: 'PicturebookClearPlan',
+        component: () => import('@/views/picturebook/ClearPlan.vue'),
+        meta: { title: '清除绘本学习计划', icon: 'Delete' }
       }
     ]
   }

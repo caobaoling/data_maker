@@ -3,7 +3,7 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>预约打星</span>
+          <span><strong>测试环境</strong>预约打星</span>
           <el-tag type="info" size="small">为课程预约添加星级评价</el-tag>
         </div>
       </template>

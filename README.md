@@ -194,19 +194,6 @@ npm run dev
 
 ## 🔧 配置说明
 
-### 数据库配置
-
-编辑 `config/database.json`:
-
-```json
-{
-    "host": "172.16.70.20",
-    "port": 3306,
-    "user": "rd_user",
-    "password": "NTHXDF7czYwi"
-}
-```
-
 ### API端点配置
 
 后端配置文件: `backend/api/*.py`

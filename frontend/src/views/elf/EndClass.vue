@@ -3,7 +3,7 @@
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
-          <span>精灵结课</span>
+          <span><strong>测试环境</strong>精灵结课</span>
           <el-tag type="primary">触发精灵结课结算</el-tag>
         </div>
       </template>

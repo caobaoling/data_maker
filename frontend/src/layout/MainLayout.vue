@@ -67,9 +67,10 @@
             <!-- <el-menu-item index="/elf/end-class" @click="handleMenuClick('/elf/end-class', '精灵结课')">
               精灵结课
             </el-menu-item> -->
-            <el-menu-item index="/elf/query-task" @click="handleMenuClick('/elf/query-task', '查询任务')">
+            <!-- 暂时隐藏：查询任务接口有问题 -->
+            <!-- <el-menu-item index="/elf/query-task" @click="handleMenuClick('/elf/query-task', '查询任务')">
               查询任务
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/elf/del-task" @click="handleMenuClick('/elf/del-task', '删除任务')">
               删除任务
             </el-menu-item>
@@ -103,25 +104,51 @@
               Redis管理
             </el-menu-item>
           </el-sub-menu>
+
+          <el-sub-menu index="picturebook">
+            <template #title>
+              <el-icon><Reading /></el-icon>
+              <span>绘本</span>
+            </template>
+            <el-menu-item index="/picturebook/clear-plan" @click="handleMenuClick('/picturebook/clear-plan', '清除绘本学习计划')">
+              清除学习计划
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
       <el-container class="main-content-wrapper">
         <!-- 多标签页 -->
         <div class="tabs-bar">
-          <div class="tabs-wrapper">
-            <div
-              v-for="tab in visitedTabs"
-              :key="tab.path"
-              class="tab-item"
-              :class="{ 'is-active': isActive(tab) }"
-              @click="handleTabClick(tab)">
-              <span>{{ tab.title }}</span>
-              <el-icon v-if="!tab.affix" class="tab-close" @click.stop="handleTabClose(tab)">
-                <Close />
-              </el-icon>
+          <el-icon
+            class="tab-nav-btn left"
+            :class="{ 'is-disabled': scrollLeft <= 0 }"
+            @click="scrollTabsLeft">
+            <ArrowLeft />
+          </el-icon>
+
+          <div class="tabs-container" ref="tabsContainerRef">
+            <div class="tabs-wrapper" ref="tabsWrapperRef">
+              <div
+                v-for="tab in visitedTabs"
+                :key="tab.path"
+                class="tab-item"
+                :class="{ 'is-active': isActive(tab) }"
+                @click="handleTabClick(tab)">
+                <span class="tab-title">{{ tab.title }}</span>
+                <el-icon v-if="!tab.affix" class="tab-close" @click.stop="handleTabClose(tab)">
+                  <Close />
+                </el-icon>
+              </div>
             </div>
           </div>
+
+          <el-icon
+            class="tab-nav-btn right"
+            :class="{ 'is-disabled': scrollLeft >= maxScrollLeft }"
+            @click="scrollTabsRight">
+            <ArrowRight />
+          </el-icon>
         </div>
 
         <!-- 主内容区 -->
@@ -134,11 +161,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
 import { ElMessageBox } from 'element-plus'
-import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close } from '@element-plus/icons-vue'
+import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -148,6 +175,115 @@ const isCollapse = ref(false)
 const activeMenu = ref(route.path)
 const sidebarWidth = computed(() => isCollapse.value ? '64px' : '200px')
 const visitedTabs = computed(() => tabsStore.visitedTabs)
+
+// 标签栏滚动相关
+const tabsContainerRef = ref(null)
+const tabsWrapperRef = ref(null)
+const scrollLeft = ref(0)
+const maxScrollLeft = ref(0)
+
+// 更新滚动状态
+const updateScrollState = () => {
+  if (tabsContainerRef.value && tabsWrapperRef.value) {
+    scrollLeft.value = tabsContainerRef.value.scrollLeft
+    maxScrollLeft.value = tabsWrapperRef.value.scrollWidth - tabsContainerRef.value.clientWidth
+  }
+}
+
+// 向左滚动
+const scrollTabsLeft = () => {
+  if (tabsContainerRef.value) {
+    const scrollAmount = 200
+    tabsContainerRef.value.scrollTo({
+      left: Math.max(0, tabsContainerRef.value.scrollLeft - scrollAmount),
+      behavior: 'smooth'
+    })
+  }
+}
+
+// 向右滚动
+const scrollTabsRight = () => {
+  if (tabsContainerRef.value && tabsWrapperRef.value) {
+    const scrollAmount = 200
+    const maxScroll = tabsWrapperRef.value.scrollWidth - tabsContainerRef.value.clientWidth
+    tabsContainerRef.value.scrollTo({
+      left: Math.min(maxScroll, tabsContainerRef.value.scrollLeft + scrollAmount),
+      behavior: 'smooth'
+    })
+  }
+}
+
+// 监听滚动事件
+onMounted(() => {
+  if (tabsContainerRef.value) {
+    tabsContainerRef.value.addEventListener('scroll', updateScrollState)
+    // 初始化滚动状态
+    nextTick(updateScrollState)
+  }
+})
+
+// 监听标签变化,更新滚动状态并自动滚动到最右侧
+watch(visitedTabs, (newTabs, oldTabs) => {
+  nextTick(() => {
+    updateScrollState()
+
+    // 如果标签数量增加了(新打开了标签),自动滚动到最右侧
+    if (newTabs.length > oldTabs?.length) {
+      scrollToRight()
+    }
+  })
+}, { deep: true })
+
+// 监听当前路由变化,切换到对应标签时自动滚动使其可见
+watch(() => route.path, () => {
+  nextTick(() => {
+    scrollToActiveTab()
+  })
+})
+
+// 滚动到最右侧
+const scrollToRight = () => {
+  if (tabsContainerRef.value && tabsWrapperRef.value) {
+    const maxScroll = tabsWrapperRef.value.scrollWidth - tabsContainerRef.value.clientWidth
+    tabsContainerRef.value.scrollTo({
+      left: maxScroll,
+      behavior: 'smooth'
+    })
+  }
+}
+
+// 滚动到激活的标签,确保其可见
+const scrollToActiveTab = () => {
+  if (!tabsContainerRef.value || !tabsWrapperRef.value) return
+
+  const activeTabIndex = visitedTabs.value.findIndex(tab => tab.path === route.path)
+  if (activeTabIndex === -1) return
+
+  const tabItems = tabsWrapperRef.value.querySelectorAll('.tab-item')
+  const activeTabElement = tabItems[activeTabIndex]
+
+  if (activeTabElement) {
+    const containerWidth = tabsContainerRef.value.clientWidth
+    const scrollLeft = tabsContainerRef.value.scrollLeft
+    const tabLeft = activeTabElement.offsetLeft
+    const tabWidth = activeTabElement.offsetWidth
+
+    // 如果标签在可视区域左侧外,滚动使其在左边缘可见
+    if (tabLeft < scrollLeft) {
+      tabsContainerRef.value.scrollTo({
+        left: tabLeft,
+        behavior: 'smooth'
+      })
+    }
+    // 如果标签在可视区域右侧外,滚动使其在右边缘可见
+    else if (tabLeft + tabWidth > scrollLeft + containerWidth) {
+      tabsContainerRef.value.scrollTo({
+        left: tabLeft + tabWidth - containerWidth,
+        behavior: 'smooth'
+      })
+    }
+  }
+}
 
 // 监听路由变化，自动同步菜单高亮
 watch(() => route.path, (newPath) => {
@@ -292,17 +428,63 @@ const handleLogout = () => {
   border-bottom: 1px solid #e4e7ed;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 5px;
   flex-shrink: 0;
+  position: relative;
 }
 
+/* 滚动按钮 */
+.tab-nav-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #606266;
+  transition: all 0.3s;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.tab-nav-btn:hover:not(.is-disabled) {
+  background: #f5f7fa;
+  color: #409eff;
+}
+
+.tab-nav-btn.is-disabled {
+  color: #c0c4cc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tab-nav-btn.left {
+  margin-right: 5px;
+}
+
+.tab-nav-btn.right {
+  margin-left: 5px;
+}
+
+/* 标签容器 - 可滚动区域 */
+.tabs-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 标签包装器 */
 .tabs-wrapper {
   display: flex;
   gap: 5px;
+  transition: transform 0.3s;
+  white-space: nowrap;
 }
 
+/* 标签项 */
 .tab-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   padding: 0 12px;
   height: 32px;
@@ -311,6 +493,16 @@ const handleLogout = () => {
   background: #fff;
   cursor: pointer;
   transition: all 0.3s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* 标签标题 */
+.tab-title {
+  display: inline-block;
+  max-width: 200px;
+  overflow: visible;
+  white-space: nowrap;
 }
 
 .tab-item:hover {
@@ -323,13 +515,21 @@ const handleLogout = () => {
   border-color: #409eff;
 }
 
+/* 关闭按钮 */
 .tab-close {
   margin-left: 8px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .tab-close:hover {
   color: #f56c6c;
+}
+
+.tab-item.is-active .tab-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
 }
 
 /* 主内容区 */
