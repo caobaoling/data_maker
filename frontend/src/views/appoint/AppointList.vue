@@ -17,6 +17,9 @@
           <el-form-item label="教师ID">
             <el-input v-model="searchForm.tId" placeholder="请输入教师ID" clearable style="width: 160px" />
           </el-form-item>
+          <el-form-item label="教材ID">
+            <el-input v-model="searchForm.courseId" placeholder="请输入教材ID" clearable style="width: 160px" />
+          </el-form-item>
           <el-form-item label="课程类型">
             <el-select v-model="searchForm.courseType" placeholder="请选择" clearable style="width: 180px">
               <el-option label="英语成人（参考）" value="1" />
@@ -28,6 +31,7 @@
               <el-option label="AI外教课" value="7" />
               <el-option label="普通话" value="31" />
               <el-option label="背单词正课" value="32" />
+              <el-option label="阿语外教" value="39" />
             </el-select>
           </el-form-item>
           <el-form-item label="课程种类">
@@ -37,6 +41,8 @@
               <el-option label="欧美付费课" value="ea_buy" />
               <el-option label="美小体验课" value="nat_free" />
               <el-option label="美小付费课" value="nat_buy" />
+              <el-option label="阿语课" value="unkown" />
+
             </el-select>
           </el-form-item>
           <el-form-item label="状态">
@@ -181,8 +187,8 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="课程ID">{{ currentRow.course_id }}</el-descriptions-item>
-        <el-descriptions-item label="课程顶级ID">{{ currentRow.course_top_id }}</el-descriptions-item>
-        <el-descriptions-item label="课程子级ID">{{ currentRow.course_sub_id }}</el-descriptions-item>
+        <el-descriptions-item label="一级教材ID (level_id)">{{ currentRow.level_id }}</el-descriptions-item>
+        <el-descriptions-item label="二级教材ID (unit_id)">{{ currentRow.unit_id }}</el-descriptions-item>
         <el-descriptions-item label="时间编号" :span="2">{{ currentRow.date_time }}</el-descriptions-item>
         <el-descriptions-item label="添加时间" :span="2">{{ currentRow.add_time }}</el-descriptions-item>
       </el-descriptions>
@@ -208,6 +214,7 @@ const searchForm = ref({
   appointId: '',
   stuId: '',
   tId: '',
+  courseId: '',
   courseType: '',
   category: '',
   status: '',
@@ -240,7 +247,8 @@ const courseTypeMap = {
   '6': '阿语陪练课',
   '7': 'AI外教课',
   '31': '普通话',
-  '32': '背单词正课'
+  '32': '背单词正课',
+  '39': '阿语外教课'
 }
 
 // 课程种类映射
@@ -249,6 +257,7 @@ const categoryMap = {
   'ph_buy': '菲教付费课',
   'ea_buy': '欧美付费课',
   'nat_free': '美小体验课',
+  'unkown': '阿语课',
   'nat_buy': '美小付费课'
 }
 
@@ -292,6 +301,7 @@ const loadData = async () => {
       appointId: searchForm.value.appointId,
       stuId: searchForm.value.stuId,
       tId: searchForm.value.tId,
+      courseId: searchForm.value.courseId,
       courseType: searchForm.value.courseType,
       category: searchForm.value.category,
       status: searchForm.value.status,
@@ -325,6 +335,7 @@ const handleReset = () => {
     appointId: '',
     stuId: '',
     tId: '',
+    courseId: '',
     courseType: '',
     category: '',
     status: '',

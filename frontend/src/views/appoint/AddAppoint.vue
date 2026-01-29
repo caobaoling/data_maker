@@ -16,6 +16,7 @@
           <el-radio-group v-model="form.courseType" @change="onCourseTypeChange">
             <el-radio label="31">普通话</el-radio>
             <el-radio label="1">英语</el-radio>
+            <el-radio label="39">阿教</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -70,21 +71,21 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="教材选择">
+        <el-form-item label="教材ID" required>
           <el-space direction="vertical" style="width: 100%">
-            <el-input v-model="form.courseId" placeholder="course_id">
-              <template #prepend>course_id</template>
+            <el-input v-model="form.levelId" placeholder="自动填充或手动输入">
+              <template #prepend>一级教材ID (level_id)</template>
             </el-input>
-            <el-input v-model="form.courseTopId" placeholder="course_top_id">
-              <template #prepend>course_top_id</template>
+            <el-input v-model="form.unitId" placeholder="自动填充或手动输入">
+              <template #prepend>二级教材ID (unit_id)</template>
             </el-input>
-            <el-input v-model="form.courseSubId" placeholder="course_sub_id">
-              <template #prepend>course_sub_id</template>
+            <el-input v-model="form.courseId" placeholder="自动填充或手动输入">
+              <template #prepend>三级教材ID (course_id)</template>
             </el-input>
-            <div style="color: #909399; font-size: 12px;">
-              💡 提示: 当前使用默认教材ID，可手动修改
-            </div>
           </el-space>
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            💡 切换课程类型会自动填充默认教材ID,也可手动修改
+          </div>
         </el-form-item>
 
         <!-- 其他设置 -->
@@ -106,10 +107,13 @@
 
         <el-descriptions :column="2" border>
           <el-descriptions-item label="点数类型">
-            {{ form.courseType === '31' ? 'pthpoint' : 'point' }}
+            {{ getPointType() }}
           </el-descriptions-item>
           <el-descriptions-item label="课程类型代码">
             {{ form.courseType }}
+          </el-descriptions-item>
+          <el-descriptions-item label="课程种类(category)">
+            {{ getCategory() }}
           </el-descriptions-item>
           <el-descriptions-item label="状态">
             {{ form.status }}
@@ -145,8 +149,8 @@
           <el-tag type="primary" size="large">{{ appointResult.appointId }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="课程类型">
-          <el-tag :type="appointResult.courseType === '31' ? 'warning' : 'success'">
-            {{ appointResult.courseType === '31' ? '普通话' : '英语' }}
+          <el-tag :type="appointResult.courseType === '31' ? 'warning' : appointResult.courseType === '39' ? 'danger' : 'success'">
+            {{ appointResult.courseType === '31' ? '普通话' : appointResult.courseType === '39' ? '阿教' : '英语' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="学生ID">
@@ -169,6 +173,9 @@
         <el-descriptions-item label="点数类型">
           {{ appointResult.pointType }}
         </el-descriptions-item>
+        <el-descriptions-item label="课程种类(category)">
+          {{ appointResult.category }}
+        </el-descriptions-item>
         <el-descriptions-item label="时间编号">
           {{ appointResult.dateTime }}
         </el-descriptions-item>
@@ -180,11 +187,11 @@
         <el-descriptions-item label="course_id" :span="2">
           {{ appointResult.courseId }}
         </el-descriptions-item>
-        <el-descriptions-item label="course_top_id">
-          {{ appointResult.courseTopId }}
+        <el-descriptions-item label="level_id">
+          {{ appointResult.levelId }}
         </el-descriptions-item>
-        <el-descriptions-item label="course_sub_id">
-          {{ appointResult.courseSubId }}
+        <el-descriptions-item label="unit_id">
+          {{ appointResult.unitId }}
         </el-descriptions-item>
         <el-descriptions-item v-if="appointResult.remark" label="备注" :span="2">
           {{ appointResult.remark }}
@@ -198,7 +205,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { addAppointCn, addAppointEn } from '@/api/appoint'
 
@@ -213,9 +220,9 @@ const form = ref({
   teacherId: '',
   startTime: '',
   usePoint: 'buy',  // 默认付费课
-  courseId: '1166431',  // 英语付费课默认教材 H5 L1-U17-L8
-  courseTopId: '1161041',
-  courseSubId: '1163731',
+  levelId: '1161041',  // 一级教材ID (默认英语付费课)
+  unitId: '1163731',  // 二级教材ID (默认英语付费课)
+  courseId: '1166431',     // 三级教材ID (默认英语付费课)
   status: 'on',
   remark: ''
 })
@@ -256,47 +263,74 @@ const updateCourseIds = () => {
   if (courseType === '1' && usePoint === 'buy') {
     // 英语付费课 (H5 L1-U17-L8)
     form.value.courseId = '1166431'
-    form.value.courseTopId = '1161041'
-    form.value.courseSubId = '1163731'
+    form.value.levelId = '1161041'
+    form.value.unitId = '1163731'
   } else if (courseType === '1' && usePoint === 'free') {
-    // 英语体验课
-    form.value.courseId = '821221'
-    form.value.courseTopId = '822151'
-    form.value.courseSubId = '820171'
+    // 英语体验课 (新默认值)
+    form.value.courseId = '1521751'
+    form.value.levelId = '20000'
+    form.value.unitId = '607292'
   } else if (courseType === '31' && usePoint === 'buy') {
     // 普通话付费课
     form.value.courseId = '1406031'
-    form.value.courseTopId = '1400011'
-    form.value.courseSubId = '1406021'
+    form.value.levelId = '1400011'
+    form.value.unitId = '1406021'
   } else if (courseType === '31' && usePoint === 'free') {
-    // 普通话体验课
-    form.value.courseId = '1399131'
-    form.value.courseTopId = '1399121'
-    form.value.courseSubId = '1398121'
+    // 普通话体验课 (新默认值)
+    form.value.courseId = '1521751'
+    form.value.levelId = '20000'
+    form.value.unitId = '607292'
+  } else if (courseType === '39' && usePoint === 'buy') {
+    // 阿教付费课 (使用与英语付费课相同的教材ID)
+    form.value.courseId = '1166431'
+    form.value.levelId = '1161041'
+    form.value.unitId = '1163731'
+  } else if (courseType === '39' && usePoint === 'free') {
+    // 阿教体验课 (新默认值)
+    form.value.courseId = '1521751'
+    form.value.levelId = '20000'
+    form.value.unitId = '607292'
   }
 }
 
 const onCourseTypeChange = () => {
   updateCourseIds()
-
   const courseType = form.value.courseType
   const usePoint = form.value.usePoint
-  const courseTypeName = courseType === '31' ? '普通话' : '英语'
-  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
-  const teacherIdHint = courseType === '31' ? '350012781' : '2821'
+  let courseTypeName = ''
+  let teacherIdHint = ''
 
-  ElMessage.info(`已切换为${courseTypeName}${usePointName}教材，教师ID参考: ${teacherIdHint}`)
+  if (courseType === '31') {
+    courseTypeName = '普通话'
+    teacherIdHint = '350012781'
+  } else if (courseType === '1') {
+    courseTypeName = '英语'
+    teacherIdHint = '2821'
+  } else if (courseType === '39') {
+    courseTypeName = '阿教'
+    teacherIdHint = '360107171'
+  }
+
+  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
+  ElMessage.success(`已切换为${courseTypeName}${usePointName}，教师ID参考: ${teacherIdHint}，教材ID已自动填充`)
 }
 
 const onUsePointChange = () => {
   updateCourseIds()
-
   const courseType = form.value.courseType
   const usePoint = form.value.usePoint
-  const courseTypeName = courseType === '31' ? '普通话' : '英语'
-  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
+  let courseTypeName = ''
 
-  ElMessage.info(`已切换为${courseTypeName}${usePointName}教材`)
+  if (courseType === '31') {
+    courseTypeName = '普通话'
+  } else if (courseType === '1') {
+    courseTypeName = '英语'
+  } else if (courseType === '39') {
+    courseTypeName = '阿教'
+  }
+
+  const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
+  ElMessage.success(`已切换为${courseTypeName}${usePointName}，教材ID已自动填充`)
 }
 
 const previewJSON = () => {
@@ -308,8 +342,33 @@ const previewJSON = () => {
   )
 }
 
+// 计算点数类型
+const getPointType = () => {
+  const courseType = form.value.courseType
+  const usePoint = form.value.usePoint
+
+  if (courseType === '31') {
+    return 'pthpoint'  // 普通话
+  } else if (courseType === '39' && usePoint === 'buy') {
+    return 'ar_point'  // 阿语付费课
+  } else {
+    return 'point'     // 英语或阿语体验课
+  }
+}
+
+// 计算课程种类
+const getCategory = () => {
+  const courseType = form.value.courseType
+  const usePoint = form.value.usePoint
+
+  if (courseType === '39') {
+    return 'unkown'  // 阿语课程
+  } else {
+    return `ph_${usePoint}`  // 其他课程
+  }
+}
+
 const buildRequestData = () => {
-  const pointType = form.value.courseType === '31' ? 'pthpoint' : 'point'
   return {
     stu_id: form.value.stuId,
     t_id: form.value.teacherId,
@@ -317,12 +376,13 @@ const buildRequestData = () => {
     end_time: endTime.value,
     date_time: dateTime.value,
     course_type: form.value.courseType,
-    point_type: pointType,
+    point_type: getPointType(),
     use_point: form.value.usePoint,
     status: form.value.status,
     course_id: form.value.courseId,
-    course_top_id: form.value.courseTopId,
-    course_sub_id: form.value.courseSubId,
+    level_id: form.value.levelId,
+    unit_id: form.value.unitId,
+    category: getCategory(),
     remark: form.value.remark
   }
 }
@@ -340,10 +400,16 @@ const submitForm = async () => {
     ElMessage.error('请选择开始时间')
     return
   }
+  // 验证教材ID是否已填写
+  if (!form.value.levelId || !form.value.unitId || !form.value.courseId) {
+    ElMessage.error('请填写完整的教材ID (一级、二级、三级)')
+    return
+  }
 
   loading.value = true
   try {
     const requestData = buildRequestData()
+    // 普通话使用addAppointCn，英语和阿教使用addAppointEn
     const api = form.value.courseType === '31' ? addAppointCn : addAppointEn
     const result = await api(requestData)
 
@@ -360,11 +426,12 @@ const submitForm = async () => {
         endTime: endTime.value,
         dateTime: dateTime.value,
         usePoint: form.value.usePoint,
-        pointType: form.value.courseType === '31' ? 'pthpoint' : 'point',
+        pointType: getPointType(),
         status: form.value.status,
         courseId: form.value.courseId,
-        courseTopId: form.value.courseTopId,
-        courseSubId: form.value.courseSubId,
+        levelId: form.value.levelId,
+        unitId: form.value.unitId,
+        category: getCategory(),
         remark: form.value.remark,
         createTime: new Date().toLocaleString('zh-CN')
       }
@@ -409,9 +476,9 @@ const resetForm = () => {
     teacherId: '',
     startTime: '',
     usePoint: 'buy',  // 默认付费课
-    courseId: '1166431',  // 英语付费课教材
-    courseTopId: '1161041',
-    courseSubId: '1163731',
+    courseId: '1166431',      // 英语付费课默认值
+    levelId: '1161041',
+    unitId: '1163731',
     status: 'on',
     remark: ''
   }

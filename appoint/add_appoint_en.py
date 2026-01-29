@@ -12,9 +12,9 @@ url = 'http://172.16.16.97/talkplatform_appointone_consumer/v1/appoint/add'
 
 t_id = 2821   # 普通话老师=350012781，外教老师=2821
 stu_id = 1587393646
-start_time = "2026-01-14 22:30:00"
+start_time = "2026-01-19 10:30:00"
 status = "on"   #on的状态
-course_type = "1"  #1v1英语课=1，普通话=31
+course_type = "1"  #1v1英语课=1，普通话=31，阿语=39
 point_type = "point"    #1v1英语课=point，普通话=pthpoint
 # # 付费课教材
 # use_point = "buy"    #付费课
@@ -33,9 +33,9 @@ point_type = "point"    #1v1英语课=point，普通话=pthpoint
 # course_sub_id = "793011"
 # 付费课教材-H5 L0-U18-L8
 use_point = "buy"    #付费课
-course_id = "793041"
+course_id = "775891"
 course_top_id = "773011"
-course_sub_id = "793011"
+course_sub_id = "771181"
 # # # 付费课教材-商务英语
 # use_point = "buy"    #付费课
 # course_id = "7775"
@@ -54,6 +54,7 @@ end_time_e = start_s + timedelta(minutes=30)
 end_time = end_time_e.strftime('%Y-%m-%d %H:%M:%S')
 # print(end_time)
 category = "ph_"+use_point
+# category = "unknown"
 # 提取小时和分钟
 dt = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
 

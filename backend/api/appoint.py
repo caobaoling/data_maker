@@ -17,8 +17,163 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from common.api_client import send_request_post
+from common.db_connect import create_connection
 
 appoint_bp = Blueprint('appoint', __name__)
+
+@appoint_bp.route('/textbooks', methods=['GET'])
+def get_textbooks():
+    """
+    获取教材数据 - 支持三级联动
+    - level: 返回一级教材列表(从JSON文件读取)
+    - units?top_id=xxx: 返回指定top_id的二级单元列表(从JSON文件读取)
+    - lessons?sub_id=xxx: 返回指定sub_id的三级课程列表(从数据库查询)
+    """
+    try:
+        import os
+        import json
+
+        # 获取查询类型
+        query_type = request.args.get('type', 'level')  # level | units | lessons
+
+        # 获取数据文件路径
+        data_dir = os.path.join(os.path.dirname(__file__), '../data')
+
+        if query_type == 'level':
+            # 返回一级教材列表
+            level_file = os.path.join(data_dir, '教材级别列表.json')
+            logger.info(f"[教材查询] 读取一级教材列表: {level_file}")
+
+            with open(level_file, 'r', encoding='utf-8') as f:
+                levels = json.load(f)
+
+            logger.info(f"[教材查询] 一级教材数量: {len(levels)}")
+
+            return jsonify({
+                'code': '10000',
+                'message': '查询成功',
+                'data': levels
+            })
+
+        elif query_type == 'units':
+            # 返回二级单元列表
+            top_id = request.args.get('top_id')
+            if not top_id:
+                return jsonify({
+                    'code': '40000',
+                    'message': '缺少top_id参数',
+                    'data': None
+                }), 400
+
+            units_file = os.path.join(data_dir, '教材单元列表.json')
+            logger.info(f"[教材查询] 读取二级单元列表: top_id={top_id}")
+
+            with open(units_file, 'r', encoding='utf-8') as f:
+                all_units = json.load(f)
+
+            # 查找匹配的top_id
+            for item in all_units:
+                if item['current_top_id'] == str(top_id):
+                    logger.info(f"[教材查询] 找到二级单元: {len(item['units'])}个")
+                    return jsonify({
+                        'code': '10000',
+                        'message': '查询成功',
+                        'data': item['units']
+                    })
+
+            # 未找到
+            logger.warning(f"[教材查询] 未找到top_id={top_id}的二级单元")
+            return jsonify({
+                'code': '10000',
+                'message': '查询成功',
+                'data': []
+            })
+
+        elif query_type == 'lessons':
+            # 返回三级课程列表(从数据库查询)
+            sub_id = request.args.get('sub_id')
+            if not sub_id:
+                return jsonify({
+                    'code': '40000',
+                    'message': '缺少sub_id参数',
+                    'data': None
+                }), 400
+
+            logger.info(f"[教材查询] 查询三级课程: sub_id={sub_id}")
+
+            # 连接数据库
+            conn = create_connection()
+            if not conn:
+                return jsonify({
+                    'code': '50000',
+                    'message': '数据库连接失败',
+                    'data': None
+                }), 500
+
+            try:
+                cursor = conn.cursor()
+
+                # 查询tree_parent_id = sub_id 且 tg='on' 的三级教材
+                sql = """
+                    SELECT id, name_zh_cn
+                    FROM textbook.series_textbook
+                    WHERE tree_parent_id = %s AND tg = 'on'
+                    ORDER BY id
+                """
+                cursor.execute(sql, (sub_id,))
+                rows = cursor.fetchall()
+
+                # 转换为列表
+                lessons = []
+                for row in rows:
+                    lessons.append({
+                        'id': str(row[0]),
+                        'lesson_name': row[1]
+                    })
+
+                cursor.close()
+                conn.close()
+
+                logger.info(f"[教材查询] 三级课程数量: {len(lessons)}")
+
+                return jsonify({
+                    'code': '10000',
+                    'message': '查询成功',
+                    'data': lessons
+                })
+
+            except Exception as e:
+                logger.error(f"[教材查询] 数据库查询异常: {str(e)}", exc_info=True)
+                if conn:
+                    conn.close()
+                return jsonify({
+                    'code': '50000',
+                    'message': f'数据库查询失败: {str(e)}',
+                    'data': None
+                }), 500
+
+        else:
+            return jsonify({
+                'code': '40000',
+                'message': f'无效的查询类型: {query_type}',
+                'data': None
+            }), 400
+
+    except FileNotFoundError as e:
+        logger.error(f"[教材查询] 文件未找到: {str(e)}", exc_info=True)
+        return jsonify({
+            'code': '50000',
+            'message': f'教材数据文件未找到: {str(e)}',
+            'data': None
+        }), 500
+
+    except Exception as e:
+        logger.error(f"[教材查询] 异常: {str(e)}", exc_info=True)
+        return jsonify({
+            'code': '50000',
+            'message': f'请求失败: {str(e)}',
+            'data': None
+        }), 500
 
 @appoint_bp.route('/add_cn', methods=['POST'])
 def add_appoint_cn():
@@ -44,7 +199,13 @@ def add_appoint_cn():
 
         # 计算 category
         use_point = data.get('use_point', 'buy')
-        category = f"ph_{use_point}"
+        course_type = data.get('course_type', '31')
+
+        # 如果前端传递了 category 参数，直接使用；否则按照旧逻辑计算
+        if 'category' in data and data['category']:
+            category = data['category']
+        else:
+            category = f"ph_{use_point}"
 
         # 组装完整的API参数（按照原始脚本的格式）
         params = {
@@ -70,8 +231,8 @@ def add_appoint_cn():
             'cancel_operator': '0',
             'use_skype_id': '0',
             'need_oral': '0',
-            'course_top_id': str(data.get('course_top_id', '100')),
-            'course_sub_id': str(data.get('course_sub_id', '10')),
+            'course_top_id': str(data.get('level_id', '100')),
+            'course_sub_id': str(data.get('unit_id', '10')),
             'course_type': str(data.get('course_type', '31')),
             'tea_salary': '0',
             'package_id': '0',
@@ -120,7 +281,13 @@ def add_appoint_en():
 
         # 计算 category（注意：英语课也用 ph_ 前缀，参考原始脚本 add_appoint_en.py:56）
         use_point = data.get('use_point', 'buy')
-        category = f"ph_{use_point}"
+        course_type = data.get('course_type', '1')
+
+        # 如果前端传递了 category 参数，直接使用；否则按照旧逻辑计算
+        if 'category' in data and data['category']:
+            category = data['category']
+        else:
+            category = f"ph_{use_point}"
 
         # 组装完整的API参数（按照原始脚本的格式）
         params = {
@@ -146,9 +313,9 @@ def add_appoint_en():
             'cancel_operator': '0',
             'use_skype_id': '0',
             'need_oral': '0',
-            'course_top_id': str(data.get('course_top_id', '100')),
-            'course_sub_id': str(data.get('course_sub_id', '10')),
-            'course_type': str(data.get('course_type', '1')),
+            'course_top_id': str(data.get('level_id', '100')),
+            'course_sub_id': str(data.get('unit_id', '10')),
+            'course_type': course_type,
             'tea_salary': '0',
             'package_id': '0',
             'category': category
@@ -192,13 +359,14 @@ def get_appoint_list():
         appoint_id = request.args.get('appointId', '')
         stu_id = request.args.get('stuId', '')
         t_id = request.args.get('tId', '')
+        course_id = request.args.get('courseId', '')
         status = request.args.get('status', '')
         course_type = request.args.get('courseType', '')
         category = request.args.get('category', '')
         start_date = request.args.get('startDate', '')
         end_date = request.args.get('endDate', '')
 
-        logger.info(f"[预约列表] 查询参数 - page:{page}, pageSize:{page_size}, appointId:{appoint_id}, stuId:{stu_id}, tId:{t_id}, category:{category}")
+        logger.info(f"[预约列表] 查询参数 - page:{page}, pageSize:{page_size}, appointId:{appoint_id}, stuId:{stu_id}, tId:{t_id}, courseId:{course_id}, category:{category}")
 
         # 构建查询条件
         conditions = []
@@ -208,6 +376,8 @@ def get_appoint_list():
             conditions.append(f"s_id = {stu_id}")
         if t_id:
             conditions.append(f"t_id = {t_id}")
+        if course_id:
+            conditions.append(f"course_id = '{course_id}'")
         if status:
             conditions.append(f"status = '{status}'")
         if course_type:
@@ -243,11 +413,11 @@ def get_appoint_list():
                 SELECT
                     id, s_id, t_id, start_time, end_time, status,
                     course_type, point_type, use_point, category,
-                    course_id, course_top_id, course_sub_id,
+                    course_id, course_top_id as level_id, course_sub_id as unit_id,
                     add_time, date_time, date, time
                 FROM talkplatform_appoint_reconstruction.appoint
                 WHERE {where_clause}
-                ORDER BY id DESC
+                ORDER BY start_time DESC
                 LIMIT {page_size} OFFSET {offset}
             """
             cursor.execute(list_sql)
