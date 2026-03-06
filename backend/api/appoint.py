@@ -225,7 +225,7 @@ def add_appoint_cn():
             'now_level': '0',
             'appoint_type': 'ios',
             'point_type': data.get('point_type', 'pthpoint'),
-            'cost_num': '1',
+            'cost_num': str(data.get('cost_num', 1)),  # 从前端获取消耗数量，默认1
             'teach_type': '51TalkAC',
             'use_point': use_point,
             'cancel_operator': '0',
@@ -307,7 +307,7 @@ def add_appoint_en():
             'now_level': '0',
             'appoint_type': 'ios',
             'point_type': data.get('point_type', 'point'),
-            'cost_num': '1',
+            'cost_num': str(data.get('cost_num', 1)),  # 从前端获取消耗数量，默认1
             'teach_type': '51TalkAC',
             'use_point': use_point,
             'cancel_operator': '0',

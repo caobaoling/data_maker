@@ -91,6 +91,24 @@
         <!-- 其他设置 -->
         <el-divider content-position="left">其他设置</el-divider>
 
+        <el-form-item label="财富类型">
+          <el-input v-model="form.pointType" placeholder="自动计算或手动输入">
+            <template #append>
+              <el-button @click="form.pointType = getPointType()">重置为自动值</el-button>
+            </template>
+          </el-input>
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            💡 默认根据课程类型自动计算，也可手动修改
+          </div>
+        </el-form-item>
+
+        <el-form-item label="消耗数量">
+          <el-input-number v-model="form.costNum" :min="0" :max="999" style="width: 100%;" />
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            💡 设置本次预约消耗的财富数量
+          </div>
+        </el-form-item>
+
         <el-form-item label="预约状态">
           <el-select v-model="form.status">
             <el-option label="正常(on)" value="on" />
@@ -107,7 +125,10 @@
 
         <el-descriptions :column="2" border>
           <el-descriptions-item label="点数类型">
-            {{ getPointType() }}
+            {{ form.pointType || getPointType() }}
+          </el-descriptions-item>
+          <el-descriptions-item label="消耗数量">
+            {{ form.costNum }}
           </el-descriptions-item>
           <el-descriptions-item label="课程类型代码">
             {{ form.courseType }}
@@ -173,6 +194,9 @@
         <el-descriptions-item label="点数类型">
           {{ appointResult.pointType }}
         </el-descriptions-item>
+        <el-descriptions-item label="消耗数量">
+          <el-tag type="warning">{{ appointResult.costNum }}</el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="课程种类(category)">
           {{ appointResult.category }}
         </el-descriptions-item>
@@ -223,6 +247,8 @@ const form = ref({
   levelId: '1161041',  // 一级教材ID (默认英语付费课)
   unitId: '1163731',  // 二级教材ID (默认英语付费课)
   courseId: '1166431',     // 三级教材ID (默认英语付费课)
+  pointType: '',  // 财富类型（空则自动计算）
+  costNum: 1,  // 消耗数量（默认1）
   status: 'on',
   remark: ''
 })
@@ -376,7 +402,8 @@ const buildRequestData = () => {
     end_time: endTime.value,
     date_time: dateTime.value,
     course_type: form.value.courseType,
-    point_type: getPointType(),
+    point_type: form.value.pointType || getPointType(),  // 优先使用手动输入的值
+    cost_num: form.value.costNum,  // 添加消耗数量
     use_point: form.value.usePoint,
     status: form.value.status,
     course_id: form.value.courseId,
@@ -426,7 +453,8 @@ const submitForm = async () => {
         endTime: endTime.value,
         dateTime: dateTime.value,
         usePoint: form.value.usePoint,
-        pointType: getPointType(),
+        pointType: form.value.pointType || getPointType(),
+        costNum: form.value.costNum,
         status: form.value.status,
         courseId: form.value.courseId,
         levelId: form.value.levelId,
@@ -479,6 +507,8 @@ const resetForm = () => {
     courseId: '1166431',      // 英语付费课默认值
     levelId: '1161041',
     unitId: '1163731',
+    pointType: '',  // 重置为空，自动计算
+    costNum: 1,  // 重置为默认值1
     status: 'on',
     remark: ''
   }

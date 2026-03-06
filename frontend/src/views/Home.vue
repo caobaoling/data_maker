@@ -126,6 +126,39 @@
           <el-descriptions-item label="📅 当前时间">
             {{ currentTime }}
           </el-descriptions-item>
+          <el-descriptions-item label="💰 财富类型">
+            <div class="editable-field">
+              <span v-if="!editingPointType" @click="startEdit('pointType')">
+                {{ pointType }}
+                <el-icon class="edit-icon"><Edit /></el-icon>
+              </span>
+              <el-input
+                v-else
+                v-model="pointType"
+                size="small"
+                @blur="stopEdit('pointType')"
+                @keyup.enter="stopEdit('pointType')"
+                style="width: 150px;"
+              />
+            </div>
+          </el-descriptions-item>
+          <el-descriptions-item label="🔢 消耗数量">
+            <div class="editable-field">
+              <span v-if="!editingCostNum" @click="startEdit('costNum')">
+                {{ costNum }}
+                <el-icon class="edit-icon"><Edit /></el-icon>
+              </span>
+              <el-input-number
+                v-else
+                v-model="costNum"
+                size="small"
+                :min="0"
+                @blur="stopEdit('costNum')"
+                @keyup.enter="stopEdit('costNum')"
+                style="width: 150px;"
+              />
+            </div>
+          </el-descriptions-item>
         </el-descriptions>
       </el-card>
     </div>
@@ -226,10 +259,17 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
+import { Edit } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const tabsStore = useTabsStore()
 const currentTime = ref('')
+
+// 财富类型和消耗数量
+const pointType = ref('point')
+const costNum = ref(1)
+const editingPointType = ref(false)
+const editingCostNum = ref(false)
 
 const updateTime = () => {
   const now = new Date()
@@ -249,6 +289,22 @@ onUnmounted(() => {
 const navigateTo = (path, title) => {
   router.push(path)
   tabsStore.addTab({ path, title })
+}
+
+const startEdit = (field) => {
+  if (field === 'pointType') {
+    editingPointType.value = true
+  } else if (field === 'costNum') {
+    editingCostNum.value = true
+  }
+}
+
+const stopEdit = (field) => {
+  if (field === 'pointType') {
+    editingPointType.value = false
+  } else if (field === 'costNum') {
+    editingCostNum.value = false
+  }
 }
 </script>
 
@@ -361,5 +417,36 @@ const navigateTo = (path, title) => {
 .tips-list li {
   margin-bottom: 8px;
   line-height: 1.6;
+}
+
+.editable-field {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editable-field span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.editable-field span:hover {
+  background-color: #f5f7fa;
+}
+
+.edit-icon {
+  font-size: 14px;
+  color: #409eff;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.editable-field span:hover .edit-icon {
+  opacity: 1;
 }
 </style>
