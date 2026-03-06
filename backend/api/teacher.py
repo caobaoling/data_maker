@@ -7,14 +7,8 @@ from flask import Blueprint, request, jsonify
 import sys
 import os
 import logging
-import requests
-import urllib3
-import hashlib
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
-# 禁用SSL警告
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +18,7 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from common.db_connect import create_connection
+from common.tms_client import get_tms_session
 
 teacher_bp = Blueprint('teacher', __name__)
 

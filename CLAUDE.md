@@ -24,6 +24,7 @@ dataMaker/
 │   ├── db_connect.py         # 数据库连接和基础CRUD操作
 │   ├── db_utils.py           # 配置文件读取工具
 │   ├── api_client.py         # HTTP请求封装(GET/POST)
+│   ├── tms_client.py         # TMS系统客户端(登录和接口调用)
 │   ├── delete_redis.py       # Redis批量删除工具(核心工具)
 │   ├── search_redis.py       # Redis查询工具
 │   ├── execute_batch.py      # 通用批量数据库操作执行器(新增)
@@ -73,6 +74,7 @@ dataMaker/
 - `talkplatform_ai_teacher`: AI外教学习计划系统
 - `talkplatform_ai_pbook`: 绘本系统
 - `point`: 点数资产系统
+- `talk`: 外教管理系统(teacher_contract等)
 
 ### 核心模块说明
 
@@ -126,11 +128,43 @@ deleter.close()
 - `send_request_get(url, params)`: GET 请求
 - `send_request_post(url, params)`: POST 请求
 
-#### 4. 配置管理 (common/db_utils.py)
+#### 4. TMS系统客户端 (common/tms_client.py) **[新增核心工具]**
+
+提供TMS系统登录和接口调用的统一封装:
+
+**核心类**: `TMSClient`
+
+**关键方法**:
+- `login()`: 登录TMS系统
+- `get_session()`: 获取已登录的Session对象
+- `call_api(endpoint, method, params, data)`: 调用TMS接口
+- `close()`: 关闭Session
+
+**便捷函数**: `get_tms_session(username, password)` - 快速获取已登录的Session
+
+**使用示例**:
+```python
+from common.tms_client import TMSClient, get_tms_session
+
+# 方式1: 使用类
+client = TMSClient()
+if client.login():
+    response = client.call_api('/tea_promotion/batchUpdateTeacherInfo',
+                               method='GET',
+                               params={'t_ids': '12345', 'field': 'sa_end_time'})
+    client.close()
+
+# 方式2: 使用便捷函数
+session = get_tms_session()
+if session:
+    response = session.get('https://tms.51talk.com/tea_promotion/...')
+```
+
+#### 5. 配置管理 (common/db_utils.py)
 
 - `load_config()`: 从 `config/database.json` 读取数据库配置
 
-#### 5. 批量数据库操作工具 (common/execute_batch.py) **[新增核心工具]**
+#### 6. 批量数据库操作工具 (common/execute_batch.py) **[新增核心工具]**
 
 提供统一的批量数据库操作执行器,支持事务回滚和详细日志:
 
