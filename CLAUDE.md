@@ -280,6 +280,50 @@ python common/delete_redis.py
 2. **数据库操作**: 避免在生产数据库上直接运行测试脚本
 3. **敏感信息**: `config/database.json` 包含敏感凭据,不应提交到版本控制
 
+### 前端开发注意事项 ⚠️
+
+#### API路径规范（重要！）
+
+创建新的前端API接口时，**必须**遵循以下规范：
+
+**✅ 正确写法：**
+```javascript
+// frontend/src/api/teacher.js
+export function addPreContract(data) {
+  return request({
+    url: '/api/teacher/add_pre_contract',  // 必须包含 /api 前缀
+    method: 'post',
+    data
+  })
+}
+```
+
+**❌ 错误写法：**
+```javascript
+export function addPreContract(data) {
+  return request({
+    url: '/teacher/add_pre_contract',  // 缺少 /api 前缀，会导致404错误
+    method: 'post',
+    data
+  })
+}
+```
+
+**原因说明：**
+1. Vite代理配置（`frontend/vite.config.js`）将所有 `/api` 开头的请求代理到后端
+2. 后端Flask应用注册蓝图时使用 `url_prefix='/api/xxx'`
+3. 完整请求路径格式：`/api/{蓝图名称}/{路由路径}`
+
+**检查清单：**
+- [ ] 前端API文件中的URL是否以 `/api/` 开头
+- [ ] 后端蓝图注册的 `url_prefix` 是否正确（在 `backend/app.py` 中）
+- [ ] 前端和后端的路径是否完全匹配
+
+**相关文件：**
+- 前端API：`frontend/src/api/*.js`
+- Vite代理：`frontend/vite.config.js`
+- 后端注册：`backend/app.py`
+
 ## API 端点
 
 项目中使用的主要内部 API:

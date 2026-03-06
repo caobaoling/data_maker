@@ -17,6 +17,7 @@ from api.redis import redis_bp
 from api.ai_teacher import ai_teacher_bp
 from api.elf import elf_bp
 from api.picturebook import picturebook_bp
+from api.teacher import teacher_bp
 
 # 创建Flask应用
 app = Flask(__name__)
@@ -36,6 +37,7 @@ app.register_blueprint(redis_bp, url_prefix='/api/redis')
 app.register_blueprint(ai_teacher_bp, url_prefix='/api/ai')
 app.register_blueprint(elf_bp, url_prefix='/api/elf')
 app.register_blueprint(picturebook_bp, url_prefix='/api/picturebook')
+app.register_blueprint(teacher_bp, url_prefix='/api/teacher')
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])

@@ -114,6 +114,16 @@
               清除学习计划
             </el-menu-item>
           </el-sub-menu>
+
+          <el-sub-menu index="teacher">
+            <template #title>
+              <el-icon><UserFilled /></el-icon>
+              <span>外教管理</span>
+            </template>
+            <el-menu-item index="/teacher/pre-contract" @click="handleMenuClick('/teacher/pre-contract', '给老师前合同(SA)')">
+              给老师前合同(SA)
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -169,7 +179,7 @@ import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
 import { ElMessageBox } from 'element-plus'
-import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight, UserFilled } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()

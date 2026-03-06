@@ -43,3 +43,9 @@ desktop.ini
 *.bak
 *.cache
 nul
+
+# 敏感配置文件
+config/database.json
+config/tms_config.json
+*.env
+.env.*

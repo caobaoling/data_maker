@@ -98,6 +98,12 @@ const routes = [
         name: 'PicturebookClearPlan',
         component: () => import('@/views/picturebook/ClearPlan.vue'),
         meta: { title: '清除绘本学习计划', icon: 'Delete' }
+      },
+      {
+        path: '/teacher/pre-contract',
+        name: 'TeacherPreContract',
+        component: () => import('@/views/teacher/PreContract.vue'),
+        meta: { title: '给老师前合同(SA)', icon: 'Document' }
       }
     ]
   }
