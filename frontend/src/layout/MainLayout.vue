@@ -84,9 +84,6 @@
               <el-icon><User /></el-icon>
               <span>AI外教</span>
             </template>
-            <el-menu-item index="/ai/add-point" @click="handleMenuClick('/ai/add-point', '添加财富')">
-              添加财富
-            </el-menu-item>
             <el-menu-item index="/ai/exchange-code" @click="handleMenuClick('/ai/exchange-code', '兑换码')">
               兑换码
             </el-menu-item>
@@ -120,8 +117,18 @@
               <el-icon><UserFilled /></el-icon>
               <span>外教管理</span>
             </template>
-            <el-menu-item index="/teacher/pre-contract" @click="handleMenuClick('/teacher/pre-contract', '给老师前合同(SA)')">
-              给老师前合同(SA)
+            <el-menu-item index="/teacher/pre-contract" @click="handleMenuClick('/teacher/contract', '给老师前合同(SA)')">
+              给老师签合同(SA)
+            </el-menu-item>
+          </el-sub-menu>
+
+          <el-sub-menu index="user">
+            <template #title>
+              <el-icon><User /></el-icon>
+              <span>用户管理</span>
+            </template>
+            <el-menu-item index="/user/add-wealth" @click="handleMenuClick('/user/add-wealth', '添加财富')">
+              添加财富
             </el-menu-item>
           </el-sub-menu>
         </el-menu>

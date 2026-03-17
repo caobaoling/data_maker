@@ -1,12 +1,13 @@
-# 文件: common/tms_client.py
+# 文件: common/get_crm_session.py
 # 作者: Claude Code
 # 创建日期: 2026/03/06
-# 描述: TMS系统客户端，提供登录和接口调用功能
+# 描述: CRM系统客户端，提供登录和接口调用功能
 
 import logging
 import requests
 import urllib3
 import hashlib
+from .env_utils import get_request_with_host_override
 
 # 禁用SSL警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -14,25 +15,25 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger(__name__)
 
 
-class TMSClient:
-    """TMS系统客户端"""
+class CRMClient:
+    """CRM系统客户端"""
 
     def __init__(self, username='admin', password='51talk20250227#'):
         """
-        初始化TMS客户端
+        初始化CRM客户端
 
         Args:
-            username: TMS用户名
-            password: TMS密码
+            username: CRM用户名
+            password: CRM密码
         """
         self.username = username
         self.password = password
         self.session = None
-        self.base_url = 'https://tms.51talk.com'
+        self.base_url = 'https://crm.51talk.com'
 
     def login(self):
         """
-        登录TMS系统
+        登录CRM系统
 
         Returns:
             bool: 登录是否成功
@@ -50,7 +51,7 @@ class TMSClient:
                 'login_type': 'tmp'
             }
 
-            logger.info(f"[TMS登录] 正在登录TMS系统...")
+            logger.info(f"[CRM登录] 正在登录CRM系统...")
 
             response = self.session.post(
                 login_url,
@@ -65,17 +66,21 @@ class TMSClient:
                 admin_code = cookies.get('admin_code')
 
                 if admin_code:
-                    logger.info(f"[TMS登录] 登录成功")
+                    logger.info(f"[CRM登录] 登录成功")
                     return True
                 else:
-                    logger.error(f"[TMS登录] 登录失败,未获取到admin_code")
+                    # 添加详细的调试信息
+                    logger.error(f"[CRM登录] 登录失败,未获取到admin_code")
+                    logger.error(f"[CRM登录] 响应状态码: {response.status_code}")
+                    logger.error(f"[CRM登录] 响应Cookies: {cookies}")
+                    logger.error(f"[CRM登录] 响应内容前500字符: {response.text[:500]}")
                     return False
             else:
-                logger.error(f"[TMS登录] 登录失败,状态码: {response.status_code}")
+                logger.error(f"[CRM登录] 登录失败,状态码: {response.status_code}")
                 return False
 
         except Exception as e:
-            logger.error(f"[TMS登录] 登录异常: {e}")
+            logger.error(f"[CRM登录] 登录异常: {e}")
             return False
 
     def get_session(self):
@@ -92,7 +97,7 @@ class TMSClient:
 
     def call_api(self, endpoint, method='GET', params=None, data=None, timeout=30):
         """
-        调用TMS接口
+        调用CRM接口 (自动适配测试/生产环境)
 
         Args:
             endpoint: 接口路径（如 '/tea_promotion/batchUpdateTeacherInfo'）
@@ -106,34 +111,27 @@ class TMSClient:
         """
         session = self.get_session()
         if not session:
-            logger.error("[TMS接口] 未登录，无法调用接口")
+            logger.error("[CRM接口] 未登录，无法调用接口")
             return None
 
         try:
             url = f'{self.base_url}{endpoint}'
 
-            if method.upper() == 'GET':
-                response = session.get(
-                    url,
-                    params=params,
-                    timeout=timeout,
-                    verify=False
-                )
-            elif method.upper() == 'POST':
-                response = session.post(
-                    url,
-                    data=data,
-                    timeout=timeout,
-                    verify=False
-                )
-            else:
-                logger.error(f"[TMS接口] 不支持的HTTP方法: {method}")
-                return None
+            # 使用环境适配方法发送请求
+            response = get_request_with_host_override(
+                session,
+                url,
+                method=method,
+                params=params,
+                data=data,
+                timeout=timeout,
+                verify=False
+            )
 
             return response
 
         except Exception as e:
-            logger.error(f"[TMS接口] 调用失败: {e}")
+            logger.error(f"[CRM接口] 调用失败: {e}")
             return None
 
     def close(self):
@@ -143,16 +141,16 @@ class TMSClient:
             self.session = None
 
 
-def get_tms_session(username='admin', password='51talk20250227#'):
+def get_crm_session(username='admin', password='51talk20250227#'):
     """
-    获取TMS Session的便捷函数（向后兼容）
+    获取CRM Session的便捷函数
 
     Args:
-        username: TMS用户名
-        password: TMS密码
+        username: CRM用户名
+        password: CRM密码
 
     Returns:
         requests.Session: 已登录的Session对象，失败返回None
     """
-    client = TMSClient(username, password)
+    client = CRMClient(username, password)
     return client.get_session()

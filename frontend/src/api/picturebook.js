@@ -13,7 +13,7 @@ import request from './request'
  */
 export function clearPicturebookPlan(params) {
   return request({
-    url: '/picturebook/clear_plan',
+    url: '/api/picturebook/clear_plan',
     method: 'post',
     data: params
   })

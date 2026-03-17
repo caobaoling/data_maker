@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify
 import sys
 import os
 import logging
+import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -18,7 +19,8 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from common.db_connect import create_connection
-from common.tms_client import get_tms_session
+from common.get_crm_session import get_crm_session
+from common.env_utils import get_request_with_host_override
 
 teacher_bp = Blueprint('teacher', __name__)
 
@@ -71,56 +73,9 @@ def insert_contract_to_db(teacher_id):
         cursor.close()
         conn.close()
 
-def get_tms_session():
+def update_crm_sa_end_time(teacher_id):
     """
-    获取TMS Session (通过表单登录)
-    返回: requests.Session对象
-    """
-    session = requests.Session()
-
-    try:
-        login_url = 'https://tms.51talk.com/admin/login.php'
-        password_md5 = hashlib.md5('51talk20250227#'.encode()).hexdigest()
-
-        credentials = {
-            'user_name': 'admin',
-            'password': password_md5,
-            'ref': '',
-            'user_type': 'admin',
-            'login_type': 'tmp'
-        }
-
-        logger.info(f"[TMS登录] 正在登录TMS系统...")
-
-        response = session.post(
-            login_url,
-            data=credentials,
-            verify=False,
-            allow_redirects=True,
-            timeout=30
-        )
-
-        if response.status_code == 200:
-            cookies = session.cookies.get_dict()
-            admin_code = cookies.get('admin_code')
-
-            if admin_code:
-                logger.info(f"[TMS登录] 登录成功")
-                return session
-            else:
-                logger.error(f"[TMS登录] 登录失败,未获取到admin_code")
-                return None
-        else:
-            logger.error(f"[TMS登录] 登录失败,状态码: {response.status_code}")
-            return None
-
-    except Exception as e:
-        logger.error(f"[TMS登录] 登录异常: {e}")
-        return None
-
-def update_tms_sa_end_time(teacher_id):
-    """
-    步骤2: 调用TMS接口更新sa_end_time
+    步骤2: 调用CRM接口更新sa_end_time (自动适配测试/生产环境)
     返回: (是否成功, 日志消息, sa_end_time值)
     """
     try:
@@ -128,13 +83,13 @@ def update_tms_sa_end_time(teacher_id):
         sa_end_time = (datetime.now() + relativedelta(years=2)).strftime('%Y-%m-%d 23:59:59')
 
         # 自动登录获取Session
-        session = get_tms_session()
+        session = get_crm_session()
         if not session:
-            log_msg = "TMS登录失败,无法获取有效Session"
-            logger.error(f"[步骤2-TMS接口] {log_msg}")
+            log_msg = "CRM登录失败,无法获取有效Session"
+            logger.error(f"[步骤2-CRM接口] {log_msg}")
             return (False, log_msg, sa_end_time)
 
-        tms_url = 'https://tms.51talk.com/tea_promotion/batchUpdateTeacherInfo'
+        crm_url = 'https://tms.51talk.com/tea_promotion/batchUpdateTeacherInfo'
         params = {
             't_ids': teacher_id,
             'field': 'sa_end_time',
@@ -142,77 +97,80 @@ def update_tms_sa_end_time(teacher_id):
             'do': '1'
         }
 
-        logger.info(f"[步骤2-TMS接口] 调用接口更新sa_end_time")
+        logger.info(f"[步骤2-CRM接口] 调用接口更新sa_end_time")
 
-        response = session.get(
-            tms_url,
+        # 使用环境适配方法发送请求
+        response = get_request_with_host_override(
+            session,
+            crm_url,
+            method='GET',
             params=params,
             timeout=30,
-            verify=False  # 忽略SSL证书验证
+            verify=False
         )
 
-        logger.info(f"[步骤2-TMS接口] 响应状态码: {response.status_code}, 响应内容: {response.text[:500]}")
+        logger.info(f"[步骤2-CRM接口] 响应状态码: {response.status_code}, 响应内容: {response.text[:500]}")
 
         if response.status_code == 200:
             response_text = response.text.strip()
 
             # 优先检查权限错误
             if 'no permission' in response_text.lower():
-                log_msg = f"TMS接口权限不足: {response_text}"
-                logger.error(f"[步骤2-TMS接口] {log_msg}")
+                log_msg = f"CRM接口权限不足: {response_text}"
+                logger.error(f"[步骤2-CRM接口] {log_msg}")
                 return (False, log_msg, sa_end_time)
 
             # 检查是否包含xdebug调试信息(说明接口调用成功,只是返回了调试信息)
             if 'xdebug-var-dump' in response_text and str(teacher_id) in response_text:
-                log_msg = f"成功更新TMS，老师ID: {teacher_id}, sa_end_time: {sa_end_time} (接口返回调试信息)"
-                logger.info(f"[步骤2-TMS接口] {log_msg}")
+                log_msg = f"成功更新CRM，老师ID: {teacher_id}, sa_end_time: {sa_end_time} (接口返回调试信息)"
+                logger.info(f"[步骤2-CRM接口] {log_msg}")
                 return (True, log_msg, sa_end_time)
 
             # 尝试解析JSON响应
             try:
                 response_data = response.json()
-                # 检查TMS接口返回的业务状态
+                # 检查CRM接口返回的业务状态
                 if response_data.get('status') == 1 or response_data.get('code') == 0:
-                    log_msg = f"成功更新TMS，老师ID: {teacher_id}, sa_end_time: {sa_end_time}"
-                    logger.info(f"[步骤2-TMS接口] {log_msg}")
+                    log_msg = f"成功更新CRM，老师ID: {teacher_id}, sa_end_time: {sa_end_time}"
+                    logger.info(f"[步骤2-CRM接口] {log_msg}")
                     return (True, log_msg, sa_end_time)
                 else:
-                    log_msg = f"TMS接口返回业务错误: {response_data.get('msg', '未知错误')}"
-                    logger.error(f"[步骤2-TMS接口] {log_msg}, 完整响应: {response.text}")
+                    log_msg = f"CRM接口返回业务错误: {response_data.get('msg', '未知错误')}"
+                    logger.error(f"[步骤2-CRM接口] {log_msg}, 完整响应: {response.text}")
                     return (False, log_msg, sa_end_time)
             except Exception as json_error:
                 # 如果不是JSON格式,检查是否包含成功标识
                 if 'success' in response_text.lower() or 'ok' in response_text.lower():
-                    log_msg = f"成功更新TMS，老师ID: {teacher_id}, sa_end_time: {sa_end_time}"
-                    logger.info(f"[步骤2-TMS接口] {log_msg}")
+                    log_msg = f"成功更新CRM，老师ID: {teacher_id}, sa_end_time: {sa_end_time}"
+                    logger.info(f"[步骤2-CRM接口] {log_msg}")
                     return (True, log_msg, sa_end_time)
                 else:
-                    log_msg = f"TMS接口返回非预期响应: {response_text[:200]}"
-                    logger.error(f"[步骤2-TMS接口] {log_msg}")
+                    log_msg = f"CRM接口返回非预期响应: {response_text[:200]}"
+                    logger.error(f"[步骤2-CRM接口] {log_msg}")
                     return (False, log_msg, sa_end_time)
         else:
-            log_msg = f"TMS接口返回错误状态码: {response.status_code}, 响应: {response.text[:200]}"
-            logger.error(f"[步骤2-TMS接口] {log_msg}")
+            log_msg = f"CRM接口返回错误状态码: {response.status_code}, 响应: {response.text[:200]}"
+            logger.error(f"[步骤2-CRM接口] {log_msg}")
             return (False, log_msg, sa_end_time)
 
     except requests.exceptions.Timeout:
-        log_msg = "TMS接口调用超时"
-        logger.error(f"[步骤2-TMS接口] {log_msg}")
+        log_msg = "CRM接口调用超时"
+        logger.error(f"[步骤2-CRM接口] {log_msg}")
         return (False, log_msg, None)
     except Exception as e:
-        log_msg = f"TMS接口调用失败: {str(e)}"
-        logger.error(f"[步骤2-TMS接口] {log_msg}")
+        log_msg = f"CRM接口调用失败: {str(e)}"
+        logger.error(f"[步骤2-CRM接口] {log_msg}")
         return (False, log_msg, None)
 
-@teacher_bp.route('/add_pre_contract', methods=['POST'])
-def add_pre_contract():
+@teacher_bp.route('/add_contract', methods=['POST'])
+def add_contract():
     """
     为老师添加合同(SA)
     参数:
         teacher_id: 老师ID (必填)
     操作:
         1. 插入数据库记录到 talk.teacher_contract
-        2. 调用TMS接口更新sa_end_time
+        2. 调用CRM接口更新sa_end_time
     """
     try:
         data = request.json
@@ -242,20 +200,20 @@ def add_pre_contract():
             'log': db_log
         })
 
-        # 步骤2: 调用TMS接口
-        tms_success, tms_log, sa_end_time = update_tms_sa_end_time(teacher_id)
+        # 步骤2: 调用CRM接口
+        crm_success, crm_log, sa_end_time = update_crm_sa_end_time(teacher_id)
         result['steps'].append({
             'step': 2,
-            'name': 'TMS接口调用',
-            'success': tms_success,
-            'log': tms_log,
+            'name': 'CRM接口调用',
+            'success': crm_success,
+            'log': crm_log,
             'sa_end_time': sa_end_time
         })
 
-        # 判断整体成功: TMS成功即为成功(即使DB跳过插入)
-        result['success'] = tms_success
+        # 判断整体成功: CRM成功即为成功(即使DB跳过插入)
+        result['success'] = crm_success
         result['db_insert'] = db_success
-        result['tms_update'] = tms_success
+        result['crm_update'] = crm_success
 
         if result['success']:
             result['message'] = f"操作完成，老师ID: {teacher_id}"

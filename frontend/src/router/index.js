@@ -100,10 +100,16 @@ const routes = [
         meta: { title: '清除绘本学习计划', icon: 'Delete' }
       },
       {
-        path: '/teacher/pre-contract',
-        name: 'TeacherPreContract',
-        component: () => import('@/views/teacher/PreContract.vue'),
-        meta: { title: '给老师前合同(SA)', icon: 'Document' }
+        path: '/teacher/contract',
+        name: 'TeacherContract',
+        component: () => import('@/views/teacher/Contract.vue'),
+        meta: { title: '给老师签合同(SA)', icon: 'Document' }
+      },
+      {
+        path: '/user/add-wealth',
+        name: 'AddWealth',
+        component: () => import('@/views/user/AddWealth.vue'),
+        meta: { title: '添加财富', icon: 'Wallet' }
       }
     ]
   }

@@ -1,18 +1,18 @@
 import request from './request'
 
-// 添加前合同
-export function addPreContract(data) {
+// 添加合同
+export function addContract(data) {
   return request({
-    url: '/api/teacher/add_pre_contract',
+    url: '/api/teacher/add_contract',
     method: 'post',
     data
   })
 }
 
-// 查询前合同
-export function queryPreContract(data) {
+// 查询合同
+export function queryContract(data) {
   return request({
-    url: '/api/teacher/query_pre_contract',
+    url: '/api/teacher/query_contract',
     method: 'post',
     data
   })

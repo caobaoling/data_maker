@@ -1,5 +1,5 @@
 <template>
-  <div class="pre-contract">
+  <div class="contract">
     <el-card class="form-card">
       <template #header>
         <div class="card-header">
@@ -71,7 +71,7 @@
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
-import { addPreContract } from '@/api/teacher'
+import { addContract } from '@/api/teacher'
 
 // 表单引用
 const formRef = ref(null)
@@ -105,7 +105,7 @@ const handleSubmit = async () => {
     submitting.value = true
     result.value = null
 
-    const res = await addPreContract({
+    const res = await addContract({
       teacher_id: form.teacher_id
     })
 
@@ -135,7 +135,7 @@ const handleReset = () => {
 </script>
 
 <style scoped>
-.pre-contract {
+.contract {
   padding: 0;
 }
 

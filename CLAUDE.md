@@ -24,7 +24,8 @@ dataMaker/
 │   ├── db_connect.py         # 数据库连接和基础CRUD操作
 │   ├── db_utils.py           # 配置文件读取工具
 │   ├── api_client.py         # HTTP请求封装(GET/POST)
-│   ├── tms_client.py         # TMS系统客户端(登录和接口调用)
+│   ├── get_crm_session.py    # CRM系统客户端(登录和接口调用)
+│   ├── env_utils.py          # 环境判断和Host适配工具
 │   ├── delete_redis.py       # Redis批量删除工具(核心工具)
 │   ├── search_redis.py       # Redis查询工具
 │   ├── execute_batch.py      # 通用批量数据库操作执行器(新增)
@@ -128,26 +129,26 @@ deleter.close()
 - `send_request_get(url, params)`: GET 请求
 - `send_request_post(url, params)`: POST 请求
 
-#### 4. TMS系统客户端 (common/tms_client.py) **[新增核心工具]**
+#### 4. CRM系统客户端 (common/get_crm_session.py) **[新增核心工具]**
 
-提供TMS系统登录和接口调用的统一封装:
+提供CRM系统登录和接口调用的统一封装，自动适配测试/生产环境:
 
-**核心类**: `TMSClient`
+**核心类**: `CRMClient`
 
 **关键方法**:
-- `login()`: 登录TMS系统
+- `login()`: 登录CRM系统
 - `get_session()`: 获取已登录的Session对象
-- `call_api(endpoint, method, params, data)`: 调用TMS接口
+- `call_api(endpoint, method, params, data)`: 调用CRM接口 (自动适配环境)
 - `close()`: 关闭Session
 
-**便捷函数**: `get_tms_session(username, password)` - 快速获取已登录的Session
+**便捷函数**: `get_crm_session(username, password)` - 快速获取已登录的Session
 
 **使用示例**:
 ```python
-from common.tms_client import TMSClient, get_tms_session
+from common.get_crm_session import CRMClient, get_crm_session
 
 # 方式1: 使用类
-client = TMSClient()
+client = CRMClient()
 if client.login():
     response = client.call_api('/tea_promotion/batchUpdateTeacherInfo',
                                method='GET',
@@ -155,10 +156,64 @@ if client.login():
     client.close()
 
 # 方式2: 使用便捷函数
-session = get_tms_session()
+session = get_crm_session()
 if session:
-    response = session.get('https://tms.51talk.com/tea_promotion/...')
+    response = session.get('https://crm.51talk.com/tea_promotion/...')
 ```
+
+#### 4.1 环境适配工具 (common/env_utils.py) **[新增核心工具]**
+
+提供测试/生产环境自动判断和DNS重定向功能:
+
+**核心类**:
+- `HostHeaderAdapter`: 自定义HTTP适配器，在底层修改DNS解析
+  - 保持URL中的域名不变 (如 `https://tms.51talk.com/...`)
+  - 实际连接到指定的测试IP (172.16.0.54)
+  - 不会触发SSL证书验证问题
+
+**核心函数**:
+- `is_test_environment()`: 判断当前是否为测试环境
+  - 方式1: 检查环境变量 `ENVIRONMENT=test`
+  - 方式2: 通过DNS解析判断 (tms.51talk.com是否解析到172.16.0.54)
+
+- `setup_session_for_environment(session)`: 为Session配置环境适配器
+  - 测试环境: 挂载 `HostHeaderAdapter` 进行DNS重定向
+  - 生产环境: 使用默认配置
+
+- `get_request_with_host_override(session, url, method, **kwargs)`: 发送HTTP请求并自动适配环境
+
+**测试环境Host映射**:
+```python
+TEST_ENV_HOSTS = {
+    'tms.51talk.com': '172.16.0.54'
+}
+```
+
+**使用示例**:
+```python
+from common.env_utils import get_request_with_host_override
+import requests
+
+session = requests.Session()
+# 自动适配环境：测试环境会在底层将域名解析重定向到测试IP
+response = get_request_with_host_override(
+    session,
+    'https://tms.51talk.com/tea_promotion/batchUpdateTeacherInfo',
+    method='GET',
+    params={'t_ids': '12345'},
+    timeout=30,
+    verify=False
+)
+```
+
+**工作原理**:
+- **测试环境**:
+  - URL保持不变: `https://tms.51talk.com/tea_promotion/...`
+  - 底层DNS解析: `tms.51talk.com` → `172.16.0.54`
+  - SSL证书验证: 使用域名 `tms.51talk.com` (不会报错)
+
+- **生产环境**:
+  - 直接使用原始URL和DNS解析
 
 #### 5. 配置管理 (common/db_utils.py)
 
@@ -203,6 +258,33 @@ conn.close()
 - 精灵排行榜数据重置 (`elf/elf_rank.py`)
 
 ### 业务模块说明
+
+#### teacher/ - 外教管理 **[新增模块]**
+
+- `backend/api/teacher.py`: 外教合同管理API
+- `frontend/src/views/teacher/Contract.vue`: 外教合同管理前端页面
+- `frontend/src/api/teacher.js`: 外教相关API接口
+
+**核心功能**:
+- 为外教添加合同(SA): 插入数据库记录并调用CRM接口更新sa_end_time
+- 查询外教合同信息
+
+**API端点**:
+- `POST /api/teacher/add_contract`: 添加外教合同
+  - 参数: `teacher_id` (必填)
+  - 步骤1: 插入 `talk.teacher_contract` 表记录
+  - 步骤2: 调用CRM接口更新 `sa_end_time` (当前时间+2年)
+- `POST /api/teacher/query_contract`: 查询外教合同
+
+**CRM系统集成**:
+- 使用 `common.get_crm_session` 模块获取CRM登录会话
+- CRM接口: `https://crm.51talk.com/tea_promotion/batchUpdateTeacherInfo`
+- 认证方式: 表单登录 (用户名/MD5密码)
+
+**前端路由**:
+- 路径: `/teacher/contract`
+- 组件: `Contract.vue`
+- 菜单标题: "给老师签合同(SA)"
 
 #### appoint/ - 课程预约
 
@@ -323,9 +405,9 @@ python common/delete_redis.py
 **✅ 正确写法：**
 ```javascript
 // frontend/src/api/teacher.js
-export function addPreContract(data) {
+export function addContract(data) {
   return request({
-    url: '/api/teacher/add_pre_contract',  // 必须包含 /api 前缀
+    url: '/api/teacher/add_contract',  // 必须包含 /api 前缀
     method: 'post',
     data
   })
@@ -334,9 +416,9 @@ export function addPreContract(data) {
 
 **❌ 错误写法：**
 ```javascript
-export function addPreContract(data) {
+export function addContract(data) {
   return request({
-    url: '/teacher/add_pre_contract',  // 缺少 /api 前缀，会导致404错误
+    url: '/teacher/add_contract',  // 缺少 /api 前缀，会导致404错误
     method: 'post',
     data
   })

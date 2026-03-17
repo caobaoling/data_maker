@@ -3,7 +3,7 @@ import request from './request'
 // 获取默认Redis配置
 export function getRedisConfig() {
   return request({
-    url: '/redis/config',
+    url: '/api/redis/config',
     method: 'get'
   })
 }
@@ -11,7 +11,7 @@ export function getRedisConfig() {
 // 搜索Redis键
 export function searchRedisKeys(data) {
   return request({
-    url: '/redis/search',
+    url: '/api/redis/search',
     method: 'post',
     data
   })
@@ -20,7 +20,7 @@ export function searchRedisKeys(data) {
 // 获取键详细信息
 export function getKeyInfo(data) {
   return request({
-    url: '/redis/key/info',
+    url: '/api/redis/key/info',
     method: 'post',
     data
   })
@@ -29,7 +29,7 @@ export function getKeyInfo(data) {
 // 删除Redis键（批量）
 export function deleteKeys(data) {
   return request({
-    url: '/redis/key/delete',
+    url: '/api/redis/key/delete',
     method: 'post',
     data
   })
@@ -41,7 +41,7 @@ export function deleteKeys(data) {
 // dry_run=false: 实际删除
 export function deleteByPattern(data) {
   return request({
-    url: '/redis/key/delete_by_pattern',
+    url: '/api/redis/key/delete_by_pattern',
     method: 'post',
     data
   })
@@ -50,7 +50,7 @@ export function deleteByPattern(data) {
 // 获取Redis统计信息
 export function getRedisStats(data) {
   return request({
-    url: '/redis/stats',
+    url: '/api/redis/stats',
     method: 'post',
     data
   })
@@ -59,7 +59,7 @@ export function getRedisStats(data) {
 // 测试Redis连接
 export function pingRedis(data) {
   return request({
-    url: '/redis/ping',
+    url: '/api/redis/ping',
     method: 'post',
     data
   })
@@ -72,7 +72,7 @@ export function pingRedis(data) {
 // dry_run=false: 实际删除
 export function multiNodeDeleteByPattern(data) {
   return request({
-    url: '/redis/multi_node/delete_by_pattern',
+    url: '/api/redis/multi_node/delete_by_pattern',
     method: 'post',
     data
   })
