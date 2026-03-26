@@ -27,22 +27,22 @@ export function getTextbookLessons(subId) {
   })
 }
 
-// 添加普通话预约
-export function addAppointCn(data) {
+// 统一添加预约接口 (支持普通话/英语/阿语)
+export function addAppoint(data) {
   return request({
-    url: '/api/appoint/add_cn',
+    url: '/api/appoint/add',
     method: 'post',
     data
   })
 }
 
-// 添加英语预约
+// 兼容旧版本(保留旧函数名)
+export function addAppointCn(data) {
+  return addAppoint(data)
+}
+
 export function addAppointEn(data) {
-  return request({
-    url: '/api/appoint/add_en',
-    method: 'post',
-    data
-  })
+  return addAppoint(data)
 }
 
 // 查询预约列表
