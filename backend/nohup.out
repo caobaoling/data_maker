@@ -1,0 +1,61 @@
+Traceback (most recent call last):
+  File "/data/xuc/dev/data_maker/backend/app.py", line 6, in <module>
+    from flask import Flask, jsonify
+ModuleNotFoundError: No module named 'flask'
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.24.170:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 526-367-674
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:24:20] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587393643, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587393643
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:24:41] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587393643, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587393643 共有 26 条记录，总计 800.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:24:42] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:24:50] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:01] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587393347, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587393347
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:08] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587393347, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587393347 共有 4 条记录，总计 100.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:09] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587393345, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587393345
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:18] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587393345, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587393345 共有 6 条记录，总计 234.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:20] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587393344, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587393344
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:25] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587393344, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587393344 共有 24 条记录，总计 632.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:26] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587401862, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587401862
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:41] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587401862, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587401862 共有 7 条记录，总计 296.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:42] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:api.user:[添加财富] 用户ID: 1587393624, 类型: 次卡(point), 数量: 100, 有效期: 300天
+INFO:api.user:[添加财富] 成功添加 100 次卡 到用户 1587393624
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:47] "POST /api/user/add_wealth HTTP/1.1" 200 -
+INFO:api.user:[查询财富] 用户ID: 1587393624, 类型: 全部
+INFO:api.user:[查询财富] 用户 1587393624 共有 44 条记录，总计 326.0
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:25:49] "POST /api/user/query_wealth HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:26:06] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:29:23] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:36:33] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2026 17:36:34] "GET /api/user/wealth_types HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/data/xuc/dev/data_maker/backend/api/appoint.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 526-367-674

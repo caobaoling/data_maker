@@ -49,3 +49,4 @@ config/database.json
 config/tms_config.json
 *.env
 .env.*
+logs/*.log
