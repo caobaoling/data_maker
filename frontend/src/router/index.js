@@ -110,6 +110,12 @@ const routes = [
         name: 'AddWealth',
         component: () => import('@/views/user/AddWealth.vue'),
         meta: { title: '添加财富', icon: 'Wallet' }
+      },
+      {
+        path: '/user/arabic-student',
+        name: 'ArabicStudent',
+        component: () => import('@/views/user/ArabicStudent.vue'),
+        meta: { title: '阿语学员', icon: 'Flag' }
       }
     ]
   }

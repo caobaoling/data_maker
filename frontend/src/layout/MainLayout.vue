@@ -130,6 +130,9 @@
             <el-menu-item index="/user/add-wealth" @click="handleMenuClick('/user/add-wealth', '添加财富')">
               添加财富
             </el-menu-item>
+            <el-menu-item index="/user/arabic-student" @click="handleMenuClick('/user/arabic-student', '阿语学员')">
+              阿语学员
+            </el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>
