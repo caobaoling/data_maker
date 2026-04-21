@@ -41,8 +41,8 @@
               <el-option label="欧美付费课" value="ea_buy" />
               <el-option label="美小体验课" value="nat_free" />
               <el-option label="美小付费课" value="nat_buy" />
-              <el-option label="阿语课" value="unkown" />
-
+              <el-option label="阿语体验课" value="unkown_free" />
+              <el-option label="阿语付费课" value="unkown_buy" />
             </el-select>
           </el-form-item>
           <el-form-item label="状态">
@@ -109,8 +109,8 @@
         </el-table-column>
         <el-table-column label="课程种类" width="130">
           <template #default="{ row }">
-            <el-tag :type="getCategoryColor(row.category)">
-              {{ getCategoryText(row.category) }}
+            <el-tag :type="getCategoryColor(row.category, row.use_point, row.course_type)">
+              {{ getCategoryText(row.category, row.use_point, row.course_type) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -182,8 +182,8 @@
         </el-descriptions-item>
         <el-descriptions-item label="点数类型">{{ currentRow.point_type }}</el-descriptions-item>
         <el-descriptions-item label="课程种类" :span="2">
-          <el-tag :type="getCategoryColor(currentRow.category)">
-            {{ getCategoryText(currentRow.category) }}
+          <el-tag :type="getCategoryColor(currentRow.category, currentRow.use_point, currentRow.course_type)">
+            {{ getCategoryText(currentRow.category, currentRow.use_point, currentRow.course_type) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="课程ID">{{ currentRow.course_id }}</el-descriptions-item>
@@ -257,7 +257,7 @@ const categoryMap = {
   'ph_buy': '菲教付费课',
   'ea_buy': '欧美付费课',
   'nat_free': '美小体验课',
-  'unkown': '阿语课',
+  
   'nat_buy': '美小付费课'
 }
 
@@ -276,13 +276,30 @@ const getCourseTypeColor = (courseType) => {
   return 'info'                            // 其他 - 灰色
 }
 
-// 获取课程种类文本
-const getCategoryText = (category) => {
+// 获取课程种类文本 (支持阿语课根据use_point和course_type区分)
+const getCategoryText = (category, usePoint, courseType) => {
+  // 特殊处理阿语课：category='unkown' 且 course_type='39'
+  if (category === 'unkown' && String(courseType) === '39') {
+    if (usePoint === 'free') return '阿语体验课'
+    if (usePoint === 'buy') return '阿语付费课'
+    return '阿语课'
+  }
+  // category='unkown' 但不是阿语课的情况
+  if (category === 'unkown') {
+    return 'unkown'
+  }
   return categoryMap[category] || category || '未知'
 }
 
 // 获取课程种类标签颜色
-const getCategoryColor = (category) => {
+const getCategoryColor = (category, usePoint, courseType) => {
+  // 特殊处理阿语课：category='unkown' 且 course_type='39'
+  if (category === 'unkown' && String(courseType) === '39') {
+    if (usePoint === 'buy') return 'warning'  // 阿语付费课 - 橙色
+    if (usePoint === 'free') return 'success'  // 阿语体验课 - 绿色
+    return 'info'
+  }
+
   if (category === 'ph_buy' || category === 'ea_buy' || category === 'nat_buy') {
     return 'warning'  // 付费课 - 橙色
   }
@@ -309,12 +326,25 @@ const loadData = async () => {
       endDate: searchForm.value.endDate
     }
 
+    // 检查是否有查询条件
+    const hasConditions = params.appointId || params.stuId || params.tId || 
+                          params.courseId || params.courseType || params.category || 
+                          params.status || params.startDate || params.endDate
+
     const result = await getAppointList(params)
 
     if (result.code === '10000') {
       tableData.value = result.data.list
       pagination.value.total = result.data.total
-      ElMessage.success(`查询成功，共 ${result.data.total} 条记录`)
+      
+      // 根据是否有查询条件显示不同提示
+      if (!hasConditions && result.data.total === 100) {
+        ElMessage.warning('未设置查询条件，仅显示最近100条数据。建议添加查询条件以获取精确结果。')
+      } else if (result.data.total >= 500) {
+        ElMessage.warning(`查询成功，数据量较大，仅显示前500条记录`)
+      } else {
+        ElMessage.success(`查询成功，共 ${result.data.total} 条记录`)
+      }
     } else {
       ElMessage.error(`查询失败: ${result.message}`)
     }

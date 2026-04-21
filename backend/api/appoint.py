@@ -112,6 +112,48 @@ def sync_appoint_to_tables(params):
             conn.close()
         return False
 
+def sync_status_to_tables(appoint_id, new_status):
+    """同步预约状态到 teanew.appoint_aggregation 和 talk.appoint 表"""
+    try:
+        conn = create_connection()
+        if not conn:
+            logger.error("[状态同步] 数据库连接失败")
+            return False
+
+        cursor = conn.cursor()
+
+        # 1. 更新 teanew.appoint_aggregation
+        update_sql_teanew = """
+            UPDATE teanew.appoint_aggregation
+            SET status = %s
+            WHERE id = %s
+        """
+        cursor.execute(update_sql_teanew, (new_status, appoint_id))
+        rows_affected_teanew = cursor.rowcount
+
+        # 2. 更新 talk.appoint
+        update_sql_talk = """
+            UPDATE talk.appoint
+            SET status = %s
+            WHERE id = %s
+        """
+        cursor.execute(update_sql_talk, (new_status, appoint_id))
+        rows_affected_talk = cursor.rowcount
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        logger.info(f"[状态同步] 成功同步预约ID: {appoint_id}, 状态: {new_status}, "
+                   f"teanew影响行数: {rows_affected_teanew}, talk影响行数: {rows_affected_talk}")
+        return True
+
+    except Exception as e:
+        logger.error(f"[状态同步] 失败: {str(e)}", exc_info=True)
+        if conn:
+            conn.close()
+        return False
+
 @appoint_bp.route('/add', methods=['POST'])
 def add_appoint():
     """
@@ -261,13 +303,30 @@ def get_appoint_list():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('pageSize', 20))
 
+        # 限制每次查询最多100条，避免数据库压力
+        max_limit = 100
+        if page_size > max_limit:
+            page_size = max_limit
+
         conditions = []
+
+        # 特殊处理阿语课查询：前端传递 unkown_free 或 unkown_buy
+        # 需要同时判断 category='unkown' 和 course_type='39'
+        category_param = request.args.get('category')
+        if category_param == 'unkown_free':
+            conditions.append("category = 'unkown' AND use_point = 'free' AND course_type = '39'")
+        elif category_param == 'unkown_buy':
+            conditions.append("category = 'unkown' AND use_point = 'buy' AND course_type = '39'")
+        elif category_param:
+            conditions.append(f"category = '{category_param}'")
+
+        # 处理其他查询条件
         for field, param in [('id', 'appointId'), ('s_id', 'stuId'), ('t_id', 'tId'),
                              ('course_id', 'courseId'), ('status', 'status'),
-                             ('course_type', 'courseType'), ('category', 'category')]:
+                             ('course_type', 'courseType')]:
             value = request.args.get(param)
             if value:
-                conditions.append(f"{field} = '{value}'" if param == 'appointId' or param == 'courseId' else f"{field} = {value}")
+                conditions.append(f"{field} = '{value}'" if param in ('appointId', 'courseId', 'status') else f"{field} = {value}")
 
         start_date = request.args.get('startDate')
         end_date = request.args.get('endDate')
@@ -284,8 +343,20 @@ def get_appoint_list():
 
         try:
             cursor = conn.cursor()
-            cursor.execute(f"SELECT COUNT(*) FROM talkplatform_appoint_reconstruction.appoint WHERE {where_clause}")
-            total = cursor.fetchone()[0]
+
+            # 判断是否有具体查询条件（非空查询）
+            has_conditions = where_clause != "1=1"
+
+            # 只在有查询条件时才计算真实总数，否则限制为100避免全表扫描
+            if has_conditions:
+                cursor.execute(f"SELECT COUNT(*) FROM talkplatform_appoint_reconstruction.appoint WHERE {where_clause}")
+                total = cursor.fetchone()[0]
+                # 即使有条件，也限制最大显示总数为500
+                total = min(total, 500)
+            else:
+                # 无查询条件时，设置总数为100，提示用户添加查询条件
+                total = 100
+                logger.warning("[预约列表] 无查询条件，限制返回100条数据")
 
             offset = (page - 1) * page_size
             sql = f"""SELECT id, s_id, t_id, start_time, end_time, status, course_type, point_type, use_point, category,
@@ -337,10 +408,22 @@ def update_appoint_status():
         api_params = {'id': str(appoint_id), 'status': new_status,
                      'cancel_time': stamp_time, 'update_time': stamp_time}
 
+        logger.info(f"[状态变更] 预约ID: {appoint_id}, 新状态: {new_status}")
+
         result = send_request_post(
             'http://172.16.16.97/talkplatform_appointone_consumer/v1/appoint/update',
             api_params
         )
+
+        logger.info(f"[状态变更] API响应: {json.dumps(result, ensure_ascii=False)}")
+
+        # 如果外部API调用成功，同步状态到其他表
+        if result.get('code') == '10000':
+            sync_success = sync_status_to_tables(appoint_id, new_status)
+            if sync_success:
+                logger.info(f"[状态变更] 状态同步成功")
+            else:
+                logger.warning(f"[状态变更] 状态同步失败(主流程成功)")
 
         return jsonify(result)
 
