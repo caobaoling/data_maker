@@ -106,6 +106,12 @@ const routes = [
         meta: { title: '给老师签合同(SA)', icon: 'Document' }
       },
       {
+        path: '/teacher/email',
+        name: 'TeacherEmail',
+        component: () => import('@/views/teacher/TeacherEmail.vue'),
+        meta: { title: '查看老师邮箱', icon: 'Message' }
+      },
+      {
         path: '/user/add-wealth',
         name: 'AddWealth',
         component: () => import('@/views/user/AddWealth.vue'),

@@ -117,8 +117,11 @@
               <el-icon><UserFilled /></el-icon>
               <span>外教管理</span>
             </template>
-            <el-menu-item index="/teacher/pre-contract" @click="handleMenuClick('/teacher/contract', '给老师前合同(SA)')">
+            <el-menu-item index="/teacher/contract" @click="handleMenuClick('/teacher/contract', '给老师签合同(SA)')">
               给老师签合同(SA)
+            </el-menu-item>
+            <el-menu-item index="/teacher/email" @click="handleMenuClick('/teacher/email', '查看老师邮箱')">
+              查看老师邮箱
             </el-menu-item>
           </el-sub-menu>
 

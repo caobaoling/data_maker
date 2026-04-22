@@ -17,3 +17,21 @@ export function queryContract(data) {
     data
   })
 }
+
+// 获取老师邮箱
+export function getTeacherEmail(data) {
+  return request({
+    url: '/api/teacher/get_email',
+    method: 'post',
+    data
+  })
+}
+
+// 重置老师密码
+export function resetTeacherPassword(data) {
+  return request({
+    url: '/api/teacher/reset_password',
+    method: 'post',
+    data
+  })
+}

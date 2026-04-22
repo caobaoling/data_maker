@@ -19,10 +19,11 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from common.db_connect import create_connection
-from common.get_crm_session import get_crm_session
+from common.get_crm_session import CRMClient
 from common.env_utils import get_request_with_host_override
 
 teacher_bp = Blueprint('teacher', __name__)
+
 
 def insert_contract_to_db(teacher_id):
     """
@@ -73,17 +74,20 @@ def insert_contract_to_db(teacher_id):
         cursor.close()
         conn.close()
 
+
 def update_crm_sa_end_time(teacher_id):
     """
     步骤2: 调用CRM接口更新sa_end_time (自动适配测试/生产环境)
     返回: (是否成功, 日志消息, sa_end_time值)
     """
+    client = None
     try:
         # 计算当前时间+2年
         sa_end_time = (datetime.now() + relativedelta(years=2)).strftime('%Y-%m-%d 23:59:59')
 
-        # 自动登录获取Session
-        session = get_crm_session()
+        # 使用 CRMClient 获取 Session
+        client = CRMClient()
+        session = client.get_session()
         if not session:
             log_msg = "CRM登录失败,无法获取有效Session"
             logger.error(f"[步骤2-CRM接口] {log_msg}")
@@ -162,6 +166,7 @@ def update_crm_sa_end_time(teacher_id):
         logger.error(f"[步骤2-CRM接口] {log_msg}")
         return (False, log_msg, None)
 
+
 @teacher_bp.route('/add_contract', methods=['POST'])
 def add_contract():
     """
@@ -237,3 +242,238 @@ def add_contract():
             'msg': f'操作失败: {str(e)}',
             'data': None
         }), 500
+
+
+@teacher_bp.route('/get_email', methods=['POST'])
+def get_teacher_email():
+    """
+    获取老师邮箱
+    参数:
+        teacher_id: 老师ID (必填)
+    操作:
+        调用TMS接口 https://tms.51talk.com/tea/show_reveal_info 查询老师邮箱
+    """
+    try:
+        data = request.json
+        teacher_id = data.get('teacher_id')
+
+        if not teacher_id:
+            return jsonify({
+                'code': '400',
+                'msg': '老师ID不能为空',
+                'data': None
+            }), 400
+
+        logger.info(f"[获取老师邮箱] 开始查询老师ID: {teacher_id}")
+
+        # 使用 CRMClient 获取 Session
+        client = CRMClient()
+        session = client.get_session()
+        if not session:
+            logger.error("[获取老师邮箱] CRM登录失败,无法获取有效Session")
+            return jsonify({
+                'code': '500',
+                'msg': 'CRM登录失败，无法获取有效Session',
+                'data': None
+            }), 500
+
+        tms_url = 'https://tms.51talk.com/tea/show_reveal_info'
+        params = {
+            'type': 'email',
+            'teacherID': teacher_id
+        }
+
+        logger.info(f"[获取老师邮箱] 调用TMS接口: {tms_url}, 参数: {params}")
+
+        # 使用环境适配方法发送请求 - POST请求使用data参数
+        response = get_request_with_host_override(
+            session,
+            tms_url,
+            method='POST',
+            data=params,
+            timeout=30,
+            verify=False
+        )
+        logger.info(f"[获取老师邮箱] 响应状态码: {response.status_code}")
+        logger.info(f"[获取老师邮箱] 响应内容: {response.text[:500]}")
+
+        if response.status_code == 200:
+            try:
+                response_data = response.json()
+                logger.info(f"[获取老师邮箱] 响应数据: {response_data}")
+                
+                # 检查接口返回状态 - status 为 1 表示成功
+                if response_data.get('status') == 1 or response_data.get('status') == 'success':
+                    # TMS接口返回的邮箱在info字段
+                    email = response_data.get('info') or response_data.get('data', {}).get('email') or response_data.get('email')
+                    if email:
+                        logger.info(f"[获取老师邮箱] 成功获取邮箱: {email}")
+                        return jsonify({
+                            'code': '0',
+                            'msg': '查询成功',
+                            'data': {
+                                'teacher_id': teacher_id,
+                                'email': email
+                            }
+                        })
+                    else:
+                        logger.warning(f"[获取老师邮箱] 接口返回成功但未找到邮箱数据")
+                        return jsonify({
+                            'code': '404',
+                            'msg': '未找到该老师的邮箱信息',
+                            'data': None
+                        })
+                else:
+                    error_msg = response_data.get('info') or response_data.get('msg') or response_data.get('message', '查询失败')
+                    logger.error(f"[获取老师邮箱] 接口返回错误: {error_msg}")
+                    return jsonify({
+                        'code': '500',
+                        'msg': f'查询失败: {error_msg}',
+                        'data': None
+                    }), 500
+            except Exception as e:
+                logger.error(f"[获取老师邮箱] 解析响应失败: {str(e)}")
+                return jsonify({
+                    'code': '500',
+                    'msg': f'解析响应失败: {str(e)}',
+                    'data': None
+                }), 500
+        else:
+            logger.error(f"[获取老师邮箱] 接口返回错误状态码: {response.status_code}")
+            return jsonify({
+                'code': '500',
+                'msg': f'接口调用失败，状态码: {response.status_code}',
+                'data': None
+            }), 500
+
+    except requests.exceptions.Timeout:
+        logger.error("[获取老师邮箱] TMS接口调用超时")
+        return jsonify({
+            'code': '500',
+            'msg': 'TMS接口调用超时',
+            'data': None
+        }), 500
+    except Exception as e:
+        logger.error(f"[获取老师邮箱] 未知错误: {str(e)}")
+        return jsonify({
+            'code': '500',
+            'msg': f'操作失败: {str(e)}',
+            'data': None
+        }), 500
+
+
+@teacher_bp.route('/reset_password', methods=['POST'])
+def reset_teacher_password():
+    """
+    重置老师密码
+    参数:
+        teacher_id: 老师ID (必填)
+    操作:
+        调用TMS接口 https://tms.51talk.com/tea_list/do_remark_teacher 重置老师密码
+    """
+    client = None
+    try:
+        data = request.json
+        teacher_id = data.get('teacher_id')
+
+        if not teacher_id:
+            return jsonify({
+                'code': '400',
+                'msg': '老师ID不能为空',
+                'data': None
+            }), 400
+
+        logger.info(f"[重置老师密码] 开始处理老师ID: {teacher_id}")
+
+        # 使用 CRMClient 获取 Session
+        client = CRMClient()
+        session = client.get_session()
+        if not session:
+            logger.error("[重置老师密码] CRM登录失败,无法获取有效Session")
+            return jsonify({
+                'code': '500',
+                'msg': 'CRM登录失败，无法获取有效Session',
+                'data': None
+            }), 500
+
+        # 调用TMS接口重置密码
+        tms_url = 'https://tms.51talk.com/tea_list/do_remark_teacher'
+        params = {
+            'content': '1',
+            'tea_id': teacher_id,
+            'type': '10'
+        }
+
+        logger.info(f"[重置老师密码] 调用TMS接口: {tms_url}, 参数: {params}")
+
+        # 使用环境适配方法发送请求 - POST请求使用data参数
+        response = get_request_with_host_override(
+            session,
+            tms_url,
+            method='POST',
+            data=params,
+            timeout=30,
+            verify=False
+        )
+
+        logger.info(f"[重置老师密码] 响应状态码: {response.status_code}")
+        logger.info(f"[重置老师密码] 响应内容: {response.text[:500]}")
+
+        if response.status_code == 200:
+            try:
+                response_data = response.json()
+                logger.info(f"[重置老师密码] 响应数据: {response_data}")
+
+                # 检查接口返回状态 - status 为 1 表示成功
+                if response_data.get('status') == 1 or response_data.get('status') == 'success':
+                    # 使用固定的成功提示文案
+                    success_msg = '密码重置成功，新密码：51talk123456'
+                    logger.info(f"[重置老师密码] 成功: {success_msg}")
+                    return jsonify({
+                        'code': '0',
+                        'msg': success_msg,
+                        'data': {
+                            'teacher_id': teacher_id,
+                            'info': success_msg
+                        }
+                    })
+                else:
+                    error_msg = response_data.get('info') or response_data.get('msg') or response_data.get('message', '重置密码失败')
+                    logger.error(f"[重置老师密码] 接口返回错误: {error_msg}")
+                    return jsonify({
+                        'code': '500',
+                        'msg': f'重置密码失败: {error_msg}',
+                        'data': None
+                    }), 500
+            except Exception as e:
+                logger.error(f"[重置老师密码] 解析响应失败: {str(e)}, 响应内容: {response.text[:500]}")
+                return jsonify({
+                    'code': '500',
+                    'msg': f'解析响应失败: {str(e)}',
+                    'data': {'raw_response': response.text[:500]}
+                }), 500
+        else:
+            logger.error(f"[重置老师密码] 接口返回错误状态码: {response.status_code}, 响应: {response.text[:200]}")
+            return jsonify({
+                'code': '500',
+                'msg': f'接口调用失败，状态码: {response.status_code}',
+                'data': None
+            }), 500
+
+    except requests.exceptions.Timeout:
+        logger.error("[重置老师密码] TMS接口调用超时")
+        return jsonify({
+            'code': '500',
+            'msg': 'TMS接口调用超时',
+            'data': None
+        }), 500
+    except Exception as e:
+        logger.error(f"[重置老师密码] 未知错误: {str(e)}")
+        return jsonify({
+            'code': '500',
+            'msg': f'操作失败: {str(e)}',
+            'data': None
+        }), 500
+    finally:
+        if client:
+            client.close()
