@@ -12,6 +12,7 @@ import io
 import jieba
 from jieba import analyse
 from wordcloud import WordCloud
+import platform  # 新增：用于检测系统类型
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -22,29 +23,95 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 tools_bp = Blueprint('tools', __name__)
 
-# 尝试常见的中文字体路径
+# ========== 优化后的中文字体路径配置 ==========
+# 1. 按优先级排序：系统默认字体 > 通用字体目录 > 项目自定义字体目录
+# 2. 覆盖 Windows（多语言版本）、Linux（主流发行版）、macOS
 CHINESE_FONTS = [
-    'C:/Windows/Fonts/simhei.ttf',  # Windows 黑体
-    'C:/Windows/Fonts/simsun.ttc',  # Windows 宋体
-    'C:/Windows/Fonts/simkai.ttf',  # Windows 楷体
-    'C:/Windows/Fonts/simfang.ttf', # Windows 仿宋
-    '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',  # Linux
-    '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',
-    '/System/Library/Fonts/PingFang.ttc',  # macOS
+    # Windows 系统（含英文/中文版本）
+    'C:/Windows/Fonts/simhei.ttf',      # 黑体
+    'C:/Windows/Fonts/simsun.ttc',      # 宋体
+    'C:/Windows/Fonts/msyh.ttc',        # 微软雅黑
+    'C:/Windows/Fonts/STSong.ttf',      # 华文宋体
+    'C:\\WINNT\\Fonts\\simhei.ttf',     # Windows 2000/XP 兼容
+    # Linux 系统（主流发行版：Ubuntu/CentOS/Debian）
+    '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',    # 文泉驿正黑
+    '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',  # 文泉驿微米黑
+    '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',  # 通用无衬线字体
+    '/usr/share/fonts/zh_CN/TrueType/simhei.ttf',      # CentOS 中文字体
+    '/usr/share/fonts/ChineseFonts/simhei.ttf',        # 自定义安装的中文字体
+    '/usr/local/share/fonts/simhei.ttf',               # 本地安装字体
+    # macOS 系统
+    '/System/Library/Fonts/PingFang.ttc',
     '/System/Library/Fonts/STHeiti Light.ttc',
+    '/Library/Fonts/Microsoft YaHei.ttc',
+    # 项目自定义字体目录（建议将字体文件放到项目中，兜底使用）
+    os.path.join(os.path.dirname(__file__), '../../fonts/simhei.ttf'),
+    os.path.join(os.path.dirname(__file__), '../fonts/simhei.ttf'),
+    './fonts/simhei.ttf'
+]
+
+# 新增：Linux 通用字体搜索目录（兜底扫描）
+LINUX_FONT_DIRS = [
+    '/usr/share/fonts',
+    '/usr/local/share/fonts',
+    '~/.fonts',
+    '/usr/share/fonts/zh_CN',
+    '/usr/share/fonts/truetype'
 ]
 
 
-def get_font_path():
-    """获取中文字体文件路径"""
-    for font in CHINESE_FONTS:
-        if os.path.exists(font):
-            logger.info(f"[词云生成] 使用字体: {font}")
-            return font
-    logger.warning("[词云生成] 未找到中文字体，将使用默认字体")
+def search_linux_chinese_font():
+    """Linux 系统下递归搜索中文字体文件"""
+    target_fonts = ['simhei.ttf', 'wqy-zenhei.ttc', 'wqy-microhei.ttc', 'msyh.ttc']
+    for font_dir in LINUX_FONT_DIRS:
+        font_dir = os.path.expanduser(font_dir)  # 解析 ~ 目录
+        if not os.path.exists(font_dir):
+            continue
+        # 递归遍历目录
+        for root, dirs, files in os.walk(font_dir):
+            for file in files:
+                if file.lower() in [f.lower() for f in target_fonts]:
+                    font_path = os.path.join(root, file)
+                    logger.info(f"[词云生成] Linux 搜索到字体: {font_path}")
+                    return font_path
     return None
 
 
+def get_font_path():
+    """获取中文字体文件路径（适配 Windows/Linux/macOS）"""
+    # 第一步：优先检测预配置的字体路径
+    for font in CHINESE_FONTS:
+        font_path = os.path.abspath(font)
+        if os.path.exists(font_path):
+            logger.info(f"[词云生成] 使用预配置字体: {font_path}")
+            return font_path
+
+    # 第二步：根据系统类型针对性搜索
+    system = platform.system().lower()
+    if system == 'linux':
+        # Linux 系统递归搜索字体
+        linux_font = search_linux_chinese_font()
+        if linux_font:
+            return linux_font
+    elif system == 'windows':
+        # Windows 系统补充搜索 Fonts 目录（兼容不同语言版本）
+        win_font_dirs = [
+            os.environ.get('WINDIR', 'C:/Windows') + '/Fonts',
+            'C:/WINNT/Fonts'
+        ]
+        win_target_fonts = ['simhei.ttf', 'simsun.ttc', 'msyh.ttc']
+        for font_dir in win_font_dirs:
+            for font_file in win_target_fonts:
+                font_path = os.path.join(font_dir, font_file)
+                if os.path.exists(font_path):
+                    logger.info(f"[词云生成] Windows 搜索到字体: {font_path}")
+                    return font_path
+
+    # 第三步：未找到字体的警告
+    logger.warning("[词云生成] 未找到中文字体文件，将使用WordCloud默认字体（可能显示乱码）")
+    return None
+
+# ========== 以下原有代码无需修改 ==========
 @tools_bp.route('/wordcloud', methods=['POST'])
 def generate_wordcloud():
     """
