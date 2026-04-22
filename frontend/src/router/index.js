@@ -122,6 +122,36 @@ const routes = [
         name: 'ArabicStudent',
         component: () => import('@/views/user/ArabicStudent.vue'),
         meta: { title: '阿语学员', icon: 'Flag' }
+      },
+      {
+        path: '/user/order',
+        name: 'OrderManage',
+        component: () => import('@/views/user/OrderManage.vue'),
+        meta: { title: '订单管理', icon: 'ShoppingCart' }
+      },
+      {
+        path: '/user/release-risk',
+        name: 'ReleaseRisk',
+        component: () => import('@/views/user/ReleaseRisk.vue'),
+        meta: { title: '解除高风险', icon: 'Unlock' }
+      },
+      {
+        path: '/tools/wordcloud',
+        name: 'WordCloud',
+        component: () => import('@/views/tools/WordCloud.vue'),
+        meta: { title: '词云生成', icon: 'Cloudy' }
+      },
+      {
+        path: '/tools/number-formatter',
+        name: 'NumberFormatter',
+        component: () => import('@/views/tools/NumberFormatter.vue'),
+        meta: { title: '数字格式化', icon: 'Grid' }
+      },
+      {
+        path: '/tools/url-unquote',
+        name: 'UrlUnquote',
+        component: () => import('@/views/tools/UrlUnquote.vue'),
+        meta: { title: '转义URL', icon: 'Link' }
       }
     ]
   }

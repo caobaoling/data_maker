@@ -136,6 +136,28 @@
             <el-menu-item index="/user/arabic-student" @click="handleMenuClick('/user/arabic-student', '阿语学员')">
               阿语学员
             </el-menu-item>
+            <el-menu-item index="/user/order" @click="handleMenuClick('/user/order', '订单管理')">
+              订单管理
+            </el-menu-item>
+            <el-menu-item index="/user/release-risk" @click="handleMenuClick('/user/release-risk', '解除高风险')">
+              解除高风险
+            </el-menu-item>
+          </el-sub-menu>
+
+          <el-sub-menu index="tools">
+            <template #title>
+              <el-icon><Tools /></el-icon>
+              <span>其他功能</span>
+            </template>
+            <el-menu-item index="/tools/wordcloud" @click="handleMenuClick('/tools/wordcloud', '词云生成')">
+              词云生成
+            </el-menu-item>
+            <el-menu-item index="/tools/number-formatter" @click="handleMenuClick('/tools/number-formatter', '数字格式化')">
+              数字格式化
+            </el-menu-item>
+            <el-menu-item index="/tools/url-unquote" @click="handleMenuClick('/tools/url-unquote', '转义URL')">
+              转义URL
+            </el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>
@@ -192,7 +214,7 @@ import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
 import { ElMessageBox } from 'element-plus'
-import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight, UserFilled } from '@element-plus/icons-vue'
+import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight, UserFilled, Tools } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()

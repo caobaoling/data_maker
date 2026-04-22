@@ -19,6 +19,9 @@ from api.elf import elf_bp
 from api.picturebook import picturebook_bp
 from api.teacher import teacher_bp
 from api.user import user_bp
+from api.tools import tools_bp
+from api.order import order_bp
+from api.risk import risk_bp
 
 # 创建Flask应用
 app = Flask(__name__)
@@ -40,6 +43,9 @@ app.register_blueprint(elf_bp, url_prefix='/api/elf')
 app.register_blueprint(picturebook_bp, url_prefix='/api/picturebook')
 app.register_blueprint(teacher_bp, url_prefix='/api/teacher')
 app.register_blueprint(user_bp, url_prefix='/api/user')
+app.register_blueprint(tools_bp, url_prefix='/api/tools')
+app.register_blueprint(order_bp, url_prefix='/api/order')
+app.register_blueprint(risk_bp, url_prefix='/api/risk')
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])
