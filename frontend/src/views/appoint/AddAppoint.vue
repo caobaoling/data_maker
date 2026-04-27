@@ -207,13 +207,13 @@
             {{ appointResult.bookType === '0' ? 'PDF' : appointResult.bookType === '1' ? 'H5' : 'Cocos' }}
           </el-tag>
           <el-button
-            v-if="appointResult.bookType === '2'"
+            v-if="appointResult.bookType === '1' || appointResult.bookType === '2'"
             type="warning"
             size="small"
             :loading="cocosLoading"
             style="margin-left: 8px;"
             @click="syncCocos">
-            同步Cocos数据库
+            同步教材数据库
           </el-button>
         </el-descriptions-item>
         <el-descriptions-item label="点数类型">
@@ -270,7 +270,7 @@ const form = ref({
   teacherId: '',
   startTime: '',
   usePoint: 'buy',  // 默认付费课
-  bookType: '1',   // 教材类型（默认H5）
+  bookType: '0',   // 教材类型（付费课默认PDF）
   levelId: '1161041',  // 一级教材ID (默认英语付费课)
   unitId: '1163731',  // 二级教材ID (默认英语付费课)
   courseId: '1166431',     // 三级教材ID (默认英语付费课)
@@ -369,9 +369,9 @@ const onCourseTypeChange = () => {
 }
 
 const onUsePointChange = () => {
-  // 切换到付费课时，重置教材类型为H5并恢复教材ID
+  // 切换到付费课时，重置教材类型为PDF(不需要同步)并恢复教材ID
   if (form.value.usePoint === 'buy') {
-    form.value.bookType = '1'
+    form.value.bookType = '0'
   }
   updateCourseIds()
   const courseType = form.value.courseType
@@ -550,7 +550,7 @@ const syncCocos = async () => {
   }
   cocosLoading.value = true
   try {
-    const result = await syncCocosBookType({ appoint_id: appointResult.value.appointId })
+    const result = await syncCocosBookType({ appoint_id: appointResult.value.appointId, book_type: appointResult.value.bookType })
     if (result.code === '10000') {
       ElMessage.success('Cocos数据库同步成功')
     } else {
@@ -571,7 +571,7 @@ const resetForm = () => {
     teacherId: '',
     startTime: '',
     usePoint: 'buy',  // 默认付费课
-    bookType: '1',   // 默认H5
+    bookType: '0',   // 付费课默认PDF
     courseId: '1166431',      // 英语付费课默认值
     levelId: '1161041',
     unitId: '1163731',
