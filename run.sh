@@ -7,27 +7,27 @@ mkdir -p $LOG_DIR
 echo "========================================"
 echo "  启动 DataMaker 服务 (后台运行)"
 echo "========================================"
-echo ""
 
 # 1. 启动后端 Flask
 echo "[1/2] 正在启动后端 Flask 服务..."
 cd backend
+# 清除旧的 PID 文件（如果有）
+[ -f backend.pid ] && rm backend.pid
 nohup python3 app.py > ../$LOG_DIR/backend.log 2>&1 &
-BACKEND_PID=$!
+echo $! > ../backend.pid  # 将 PID 保存到上一级目录
 cd ..
-echo "后端已启动 (PID: $BACKEND_PID)，日志: $LOG_DIR/backend.log"
-
-# 等待后端启动（可根据实际情况调整秒数）
-sleep 2
+echo "后端已启动 (PID: $(cat backend.pid))"
 
 # 2. 启动前端 Vue
 echo "[2/2] 正在启动前端 Vue 开发服务器..."
 cd frontend
-# 这里根据你之前的需求，添加 --host 和 8500 端口
+# 清除旧的 PID 文件（如果有）
+[ -f frontend.pid ] && rm frontend.pid
 nohup npm run dev -- --host --port 8500 > ../$LOG_DIR/frontend.log 2>&1 &
-FRONTEND_PID=$!
+echo $! > ../frontend.pid # 将 PID 保存到上一级目录
 cd ..
-echo "前端已启动 (PID: $FRONTEND_PID)，日志: $LOG_DIR/frontend.log"
+echo "前端已启动 (PID: $(cat frontend.pid))"
+
 
 echo ""
 echo "========================================"
