@@ -63,6 +63,15 @@ export function updateAppointStatus(data) {
   })
 }
 
+// 同步Cocos教材数据库
+export function syncCocosBookType(data) {
+  return request({
+    url: '/api/appoint/sync_cocos',
+    method: 'post',
+    data
+  })
+}
+
 // 给预约打星
 export function addAppointStar(data) {
   return request({

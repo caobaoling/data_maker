@@ -71,6 +71,17 @@
           </el-radio-group>
         </el-form-item>
 
+        <el-form-item v-if="form.usePoint === 'free'" label="教材类型">
+          <el-select v-model="form.bookType" @change="onBookTypeChange" style="width: 200px;">
+            <el-option label="PDF (book_type=0)" value="0" />
+            <el-option label="H5 (book_type=1)" value="1" />
+            <el-option label="Cocos (book_type=2)" value="2" />
+          </el-select>
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            💡 选择Cocos时，教材ID(course_id)会自动设置为1801191，并在预约成功后同步更新相关数据库
+          </div>
+        </el-form-item>
+
         <el-form-item label="教材ID" required>
           <el-space direction="vertical" style="width: 100%">
             <el-input v-model="form.levelId" placeholder="自动填充或手动输入">
@@ -191,6 +202,20 @@
             {{ appointResult.usePoint === 'buy' ? '付费课' : '体验课' }}
           </el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="教材类型">
+          <el-tag :type="appointResult.bookType === '2' ? 'danger' : appointResult.bookType === '1' ? 'success' : 'warning'">
+            {{ appointResult.bookType === '0' ? 'PDF' : appointResult.bookType === '1' ? 'H5' : 'Cocos' }}
+          </el-tag>
+          <el-button
+            v-if="appointResult.bookType === '2'"
+            type="warning"
+            size="small"
+            :loading="cocosLoading"
+            style="margin-left: 8px;"
+            @click="syncCocos">
+            同步Cocos数据库
+          </el-button>
+        </el-descriptions-item>
         <el-descriptions-item label="点数类型">
           {{ appointResult.pointType }}
         </el-descriptions-item>
@@ -231,9 +256,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { addAppointCn, addAppointEn } from '@/api/appoint'
+import { addAppointCn, addAppointEn, syncCocosBookType } from '@/api/appoint'
 
 const loading = ref(false)
+const cocosLoading = ref(false)
 
 // 预约结果数据
 const appointResult = ref(null)
@@ -244,6 +270,7 @@ const form = ref({
   teacherId: '',
   startTime: '',
   usePoint: 'buy',  // 默认付费课
+  bookType: '1',   // 教材类型（默认H5）
   levelId: '1161041',  // 一级教材ID (默认英语付费课)
   unitId: '1163731',  // 二级教材ID (默认英语付费课)
   courseId: '1166431',     // 三级教材ID (默认英语付费课)
@@ -342,6 +369,10 @@ const onCourseTypeChange = () => {
 }
 
 const onUsePointChange = () => {
+  // 切换到付费课时，重置教材类型为H5并恢复教材ID
+  if (form.value.usePoint === 'buy') {
+    form.value.bookType = '1'
+  }
   updateCourseIds()
   const courseType = form.value.courseType
   const usePoint = form.value.usePoint
@@ -357,6 +388,19 @@ const onUsePointChange = () => {
 
   const usePointName = usePoint === 'buy' ? '付费课' : '体验课'
   ElMessage.success(`已切换为${courseTypeName}${usePointName}，教材ID已自动填充`)
+}
+
+const onBookTypeChange = () => {
+  if (form.value.bookType === '2') {
+    // Cocos教材：固定course_id=1801191
+    form.value.courseId = '1801191'
+    ElMessage.success('已选择Cocos教材，course_id已自动设置为1801191')
+  } else {
+    // 切换回非Cocos教材：恢复当前课程类型+性质对应的默认course_id
+    updateCourseIds()
+    const label = form.value.bookType === '0' ? 'PDF' : 'H5'
+    ElMessage.success(`已切换为${label}教材，教材ID已恢复默认值`)
+  }
 }
 
 const previewJSON = () => {
@@ -405,6 +449,7 @@ const buildRequestData = () => {
     point_type: form.value.pointType || getPointType(),  // 优先使用手动输入的值
     cost_num: form.value.costNum,  // 添加消耗数量
     use_point: form.value.usePoint,
+    book_type: form.value.bookType,  // 教材类型
     status: form.value.status,
     course_id: form.value.courseId,
     level_id: form.value.levelId,
@@ -453,6 +498,7 @@ const submitForm = async () => {
         endTime: endTime.value,
         dateTime: dateTime.value,
         usePoint: form.value.usePoint,
+        bookType: form.value.bookType,
         pointType: form.value.pointType || getPointType(),
         costNum: form.value.costNum,
         status: form.value.status,
@@ -461,7 +507,8 @@ const submitForm = async () => {
         unitId: form.value.unitId,
         category: getCategory(),
         remark: form.value.remark,
-        createTime: new Date().toLocaleString('zh-CN')
+        createTime: new Date().toLocaleString('zh-CN'),
+        cocosSync: result.cocos_sync  // Cocos同步结果
       }
 
       // 滚动到结果区域
@@ -496,6 +543,26 @@ const submitForm = async () => {
   }
 }
 
+const syncCocos = async () => {
+  if (!appointResult.value?.appointId) {
+    ElMessage.error('未找到预约ID')
+    return
+  }
+  cocosLoading.value = true
+  try {
+    const result = await syncCocosBookType({ appoint_id: appointResult.value.appointId })
+    if (result.code === '10000') {
+      ElMessage.success('Cocos数据库同步成功')
+    } else {
+      ElMessage.error(`同步失败: ${result.message || '未知错误'}`)
+    }
+  } catch (error) {
+    ElMessage.error(`请求失败: ${error.message}`)
+  } finally {
+    cocosLoading.value = false
+  }
+}
+
 const resetForm = () => {
   // 清空表单
   form.value = {
@@ -504,6 +571,7 @@ const resetForm = () => {
     teacherId: '',
     startTime: '',
     usePoint: 'buy',  // 默认付费课
+    bookType: '1',   // 默认H5
     courseId: '1166431',      // 英语付费课默认值
     levelId: '1161041',
     unitId: '1163731',

@@ -45,6 +45,75 @@ COURSE_TYPE_CONFIG = {
     }
 }
 
+def sync_cocos_book_type(appoint_id):
+    """预约使用Cocos教材时，同步更新3个相关数据库表"""
+    import time
+    conn = None
+    try:
+        conn = create_connection()
+        if not conn:
+            logger.error("[Cocos同步] 数据库连接失败")
+            return False
+
+        cursor = conn.cursor()
+
+        # 等待热数据表写入，最多重试6次，每次等待5秒
+        max_retries = 6
+        retry_interval = 5
+        for attempt in range(max_retries):
+            cursor.execute(
+                "SELECT COUNT(*) FROM `talkplatform_timetable`.`teacher_hot_timetable` WHERE `lesson_id` = %s",
+                (str(appoint_id),)
+            )
+            if cursor.fetchone()[0] > 0:
+                logger.info(f"[Cocos同步] 热数据表已就绪，第{attempt + 1}次检查")
+                break
+            logger.info(f"[Cocos同步] 热数据表暂无记录，等待{retry_interval}秒后重试({attempt + 1}/{max_retries})")
+            time.sleep(retry_interval)
+        else:
+            logger.warning(f"[Cocos同步] 等待超时，热数据表仍无记录，跳过前两条更新")
+
+        # 1. 更新 talkplatform_timetable.teacher_hot_timetable
+        cursor.execute(
+            "UPDATE `talkplatform_timetable`.`teacher_hot_timetable` SET `book_type` = 2 WHERE `lesson_id` = %s",
+            (str(appoint_id),)
+        )
+        logger.info(f"[Cocos同步] teacher_hot_timetable 影响行数: {cursor.rowcount}")
+        conn.commit()
+
+        # 2. 更新 talkplatform_timetable.student_hot_timetable
+        cursor.execute(
+            "UPDATE `talkplatform_timetable`.`student_hot_timetable` SET `book_type` = 2 WHERE `lesson_id` = %s",
+            (str(appoint_id),)
+        )
+        logger.info(f"[Cocos同步] student_hot_timetable 影响行数: {cursor.rowcount}")
+        conn.commit()
+
+        # 3. 插入或更新 talkplatform_appoint_reconstruction.appoint_book_type
+        cursor.execute(
+            """INSERT INTO talkplatform_appoint_reconstruction.appoint_book_type (id, s_id, appoint_id, book_type, operator_id)
+               SELECT %s, s_id, %s, 1, 237
+               FROM talk.appoint
+               WHERE id = %s
+               ON DUPLICATE KEY UPDATE book_type = 2""",
+            (int(appoint_id), int(appoint_id), int(appoint_id))
+        )
+        logger.info(f"[Cocos同步] appoint_book_type 影响行数: {cursor.rowcount}")
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        logger.info(f"[Cocos同步] 成功同步预约ID: {appoint_id}")
+        return True
+
+    except Exception as e:
+        logger.error(f"[Cocos同步] 失败: {str(e)}", exc_info=True)
+        if conn:
+            conn.close()
+        return False
+
+
 def sync_appoint_to_tables(params):
     """同步预约数据到 teanew.appoint_aggregation 和 talk.appoint 表"""
     try:
@@ -231,6 +300,16 @@ def add_appoint():
                 logger.info(f"[{config['log_name']}预约] 数据同步成功")
             else:
                 logger.warning(f"[{config['log_name']}预约] 数据同步失败(主流程成功)")
+
+            # Cocos教材特殊处理：后台线程异步同步，避免阻塞请求
+            book_type = str(data.get('book_type', '1'))
+            if book_type == '2':
+                import threading
+                real_appoint_id = result.get('res', {}).get('id') or params['id']
+                thread = threading.Thread(target=sync_cocos_book_type, args=(real_appoint_id,))
+                thread.daemon = True
+                thread.start()
+                logger.info(f"[{config['log_name']}预约] Cocos教材同步已在后台启动，appoint_id: {real_appoint_id}")
 
         return jsonify(result)
 
@@ -430,6 +509,25 @@ def update_appoint_status():
     except Exception as e:
         logger.error(f"[状态变更] 异常: {str(e)}", exc_info=True)
         return jsonify({'code': '50000', 'message': f'请求失败: {str(e)}'}), 500
+
+@appoint_bp.route('/sync_cocos', methods=['POST'])
+def sync_cocos():
+    """手动触发Cocos教材数据库同步"""
+    try:
+        data = request.json
+        appoint_id = data.get('appoint_id')
+        if not appoint_id:
+            return jsonify({'code': '40000', 'message': '预约ID不能为空'}), 400
+
+        success = sync_cocos_book_type(appoint_id)
+        if success:
+            return jsonify({'code': '10000', 'message': '同步成功'})
+        else:
+            return jsonify({'code': '50000', 'message': '同步失败，请查看后端日志'})
+    except Exception as e:
+        logger.error(f"[Cocos手动同步] 异常: {str(e)}", exc_info=True)
+        return jsonify({'code': '50000', 'message': f'请求失败: {str(e)}'}), 500
+
 
 @appoint_bp.route('/add_star', methods=['POST'])
 def add_appoint_star():
