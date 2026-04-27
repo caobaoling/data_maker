@@ -30,6 +30,6 @@ kill_process "frontend.pid"
 echo ""
 echo "[2/2] 正在重新启动服务..."
 # 调用 start.sh
-bash start.sh
+bash run.sh
 
 echo "重启完成。"
