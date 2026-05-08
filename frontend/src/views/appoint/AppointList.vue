@@ -453,6 +453,21 @@ const handleStatusChange = async (row, newStatus) => {
   }
 }
 
+const copyToClipboard = async (text) => {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text)
+  } else {
+    const el = document.createElement('textarea')
+    el.value = text
+    el.style.position = 'fixed'
+    el.style.opacity = '0'
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  }
+}
+
 const handleGenerateTeacherLink = async (row) => {
   teacherLinkLoadingId.value = row.id
   try {
@@ -460,7 +475,7 @@ const handleGenerateTeacherLink = async (row) => {
     if (result.code === '10000') {
       const token = result.data.token
       const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
-      await navigator.clipboard.writeText(link)
+      await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
         '老师上课链接（已复制到剪贴板）',
@@ -483,7 +498,7 @@ const handleGenerateClassLink = async (row) => {
     if (result.code === '10000') {
       const token = result.data.token
       const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
-      await navigator.clipboard.writeText(link)
+      await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
         '学员上课链接（已复制到剪贴板）',

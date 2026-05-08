@@ -590,6 +590,21 @@ const syncCocos = async () => {
   }
 }
 
+const copyToClipboard = async (text) => {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text)
+  } else {
+    const el = document.createElement('textarea')
+    el.value = text
+    el.style.position = 'fixed'
+    el.style.opacity = '0'
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  }
+}
+
 const generateClassLink = async () => {
   if (!appointResult.value?.appointId || !appointResult.value?.stuId) {
     ElMessage.error('缺少预约ID或学员ID')
@@ -601,7 +616,7 @@ const generateClassLink = async () => {
     if (result.code === '10000') {
       const token = result.data.token
       const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
-      await navigator.clipboard.writeText(link)
+      await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
         '学员上课链接（已复制到剪贴板）',
@@ -628,7 +643,7 @@ const generateTeacherLink = async () => {
     if (result.code === '10000') {
       const token = result.data.token
       const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
-      await navigator.clipboard.writeText(link)
+      await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
         '老师上课链接（已复制到剪贴板）',
