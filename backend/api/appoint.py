@@ -254,7 +254,7 @@ def add_appoint():
             'appoint_type': 'ios',
             'point_type': point_type,
             'cost_num': str(data.get('cost_num', 1)),
-            'teach_type': '51TalkAC',
+            'teach_type': data.get('teach_type', '51TalkAC'),
             'use_point': use_point,
             'cancel_operator': '0',
             'use_skype_id': '0',
@@ -426,7 +426,7 @@ def get_appoint_list():
 
             offset = (page - 1) * page_size
             sql = f"""SELECT id, s_id, t_id, start_time, end_time, status, course_type, point_type, use_point, category,
-                      course_id, course_top_id as level_id, course_sub_id as unit_id, add_time, date_time, date, time
+                      course_id, course_top_id as level_id, course_sub_id as unit_id, add_time, date_time, date, time, teach_type
                       FROM talkplatform_appoint_reconstruction.appoint WHERE {where_clause}
                       ORDER BY start_time DESC LIMIT {page_size} OFFSET {offset}"""
             cursor.execute(sql)
@@ -514,6 +514,33 @@ def sync_cocos():
             return jsonify({'code': '50000', 'message': '同步失败，请查看后端日志'})
     except Exception as e:
         logger.error(f"[教材手动同步] 异常: {str(e)}", exc_info=True)
+        return jsonify({'code': '50000', 'message': f'请求失败: {str(e)}'}), 500
+
+
+@appoint_bp.route('/get_class_token', methods=['GET'])
+def get_class_token():
+    """获取学员上课 token（用于生成 WebAC 上课链接）"""
+    try:
+        import requests as req
+        user_id = request.args.get('user_id')
+        if not user_id:
+            return jsonify({'code': '40000', 'message': 'user_id 不能为空'}), 400
+
+        user_type = request.args.get('user_type', '')
+        url = f'https://junior.51suyang.cn/mobile/user/index7?user_id={user_id}&user_type={user_type}'
+        logger.info(f"[获取Token] user_id: {user_id}, 请求URL: {url}")
+
+        resp = req.get(url, timeout=10)
+        token = resp.text.strip()
+
+        if not token:
+            return jsonify({'code': '50000', 'message': '获取 token 失败，接口返回为空'})
+
+        logger.info(f"[获取Token] user_id: {user_id}, token 获取成功")
+        return jsonify({'code': '10000', 'message': '获取成功', 'data': {'token': token}})
+
+    except Exception as e:
+        logger.error(f"[获取Token] 异常: {str(e)}", exc_info=True)
         return jsonify({'code': '50000', 'message': f'请求失败: {str(e)}'}), 500
 
 

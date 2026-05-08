@@ -72,6 +72,16 @@ export function syncCocosBookType(data) {
   })
 }
 
+// 获取上课 token（用于 WebAC 上课链接）
+// userType: 学员留空，老师传 'tea_h5j'
+export function getClassToken(userId, userType = '') {
+  return request({
+    url: '/api/appoint/get_class_token',
+    method: 'get',
+    params: { user_id: userId, user_type: userType }
+  })
+}
+
 // 给预约打星
 export function addAppointStar(data) {
   return request({

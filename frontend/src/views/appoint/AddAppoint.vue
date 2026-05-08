@@ -120,6 +120,13 @@
           </div>
         </el-form-item>
 
+        <el-form-item label="上课方式">
+          <el-select v-model="form.teachType" style="width: 200px;">
+            <el-option label="AC上课 (51TalkAC)" value="51TalkAC" />
+            <el-option label="网页版上课 (WebAc)" value="WebAc" />
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="预约状态">
           <el-select v-model="form.status">
             <el-option label="正常(on)" value="on" />
@@ -162,6 +169,22 @@
           </el-button>
           <el-button size="large" @click="previewJSON">
             预览请求JSON
+          </el-button>
+          <el-button
+            v-if="appointResult && form.teachType === 'WebAc'"
+            type="success"
+            size="large"
+            :loading="classLinkLoading"
+            @click="generateClassLink">
+            生成学员上课链接
+          </el-button>
+          <el-button
+            v-if="appointResult && form.teachType === 'WebAc'"
+            type="warning"
+            size="large"
+            :loading="teacherLinkLoading"
+            @click="generateTeacherLink">
+            生成老师上课链接
           </el-button>
         </el-form-item>
       </el-form>
@@ -256,10 +279,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { addAppointCn, addAppointEn, syncCocosBookType } from '@/api/appoint'
+import { addAppointCn, addAppointEn, syncCocosBookType, getClassToken } from '@/api/appoint'
 
 const loading = ref(false)
 const cocosLoading = ref(false)
+const classLinkLoading = ref(false)
+const teacherLinkLoading = ref(false)
 
 // 预约结果数据
 const appointResult = ref(null)
@@ -276,6 +301,7 @@ const form = ref({
   courseId: '1166431',     // 三级教材ID (默认英语付费课)
   pointType: '',  // 财富类型（空则自动计算）
   costNum: 1,  // 消耗数量（默认1）
+  teachType: '51TalkAC',  // 上课方式（默认AC上课）
   status: 'on',
   remark: ''
 })
@@ -450,6 +476,7 @@ const buildRequestData = () => {
     cost_num: form.value.costNum,  // 添加消耗数量
     use_point: form.value.usePoint,
     book_type: form.value.bookType,  // 教材类型
+    teach_type: form.value.teachType,  // 上课方式
     status: form.value.status,
     course_id: form.value.courseId,
     level_id: form.value.levelId,
@@ -563,6 +590,60 @@ const syncCocos = async () => {
   }
 }
 
+const generateClassLink = async () => {
+  if (!appointResult.value?.appointId || !appointResult.value?.stuId) {
+    ElMessage.error('缺少预约ID或学员ID')
+    return
+  }
+  classLinkLoading.value = true
+  try {
+    const result = await getClassToken(appointResult.value.stuId)
+    if (result.code === '10000') {
+      const token = result.data.token
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      await navigator.clipboard.writeText(link)
+      ElMessageBox.alert(
+        `<div style="word-break:break-all;">${link}</div>`,
+        '学员上课链接（已复制到剪贴板）',
+        { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
+      )
+    } else {
+      ElMessage.error(`获取 token 失败: ${result.message || '未知错误'}`)
+    }
+  } catch (error) {
+    ElMessage.error(`请求失败: ${error.message}`)
+  } finally {
+    classLinkLoading.value = false
+  }
+}
+
+const generateTeacherLink = async () => {
+  if (!appointResult.value?.appointId || !appointResult.value?.teacherId) {
+    ElMessage.error('缺少预约ID或教师ID')
+    return
+  }
+  teacherLinkLoading.value = true
+  try {
+    const result = await getClassToken(appointResult.value.teacherId, 'tea_h5j')
+    if (result.code === '10000') {
+      const token = result.data.token
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      await navigator.clipboard.writeText(link)
+      ElMessageBox.alert(
+        `<div style="word-break:break-all;">${link}</div>`,
+        '老师上课链接（已复制到剪贴板）',
+        { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
+      )
+    } else {
+      ElMessage.error(`获取 token 失败: ${result.message || '未知错误'}`)
+    }
+  } catch (error) {
+    ElMessage.error(`请求失败: ${error.message}`)
+  } finally {
+    teacherLinkLoading.value = false
+  }
+}
+
 const resetForm = () => {
   // 清空表单
   form.value = {
@@ -577,6 +658,7 @@ const resetForm = () => {
     unitId: '1163731',
     pointType: '',  // 重置为空，自动计算
     costNum: 1,  // 重置为默认值1
+    teachType: '51TalkAC',  // 上课方式（默认AC上课）
     status: 'on',
     remark: ''
   }

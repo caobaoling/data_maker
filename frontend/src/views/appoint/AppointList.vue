@@ -115,9 +115,33 @@
           </template>
         </el-table-column>
         <el-table-column prop="date_time" label="时间编号" width="140" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="上课方式" width="110">
+          <template #default="{ row }">
+            <el-tag v-if="row.teach_type === 'WebAc'" type="success">网页版(WebAc)</el-tag>
+            <el-tag v-else-if="row.teach_type === '51TalkAC'" type="primary">AC上课</el-tag>
+            <el-tag v-else-if="row.teach_type" type="info">{{ row.teach_type }}</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleViewDetail(row)">详情</el-button>
+            <el-button
+              v-if="row.teach_type === 'WebAc'"
+              type="success"
+              link
+              :loading="classLinkLoadingId === row.id"
+              @click="handleGenerateClassLink(row)">
+              学员链接
+            </el-button>
+            <el-button
+              v-if="row.teach_type === 'WebAc'"
+              type="warning"
+              link
+              :loading="teacherLinkLoadingId === row.id"
+              @click="handleGenerateTeacherLink(row)">
+              老师链接
+            </el-button>
             <el-dropdown @command="(status) => handleStatusChange(row, status)" trigger="click">
               <el-button type="warning" link>
                 变更状态 <el-icon class="el-icon--right"><arrow-down /></el-icon>
@@ -203,12 +227,14 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
-import { getAppointList, updateAppointStatus } from '@/api/appoint'
+import { getAppointList, updateAppointStatus, getClassToken } from '@/api/appoint'
 
 const loading = ref(false)
 const tableData = ref([])
 const detailVisible = ref(false)
 const currentRow = ref(null)
+const classLinkLoadingId = ref(null)
+const teacherLinkLoadingId = ref(null)
 
 const searchForm = ref({
   appointId: '',
@@ -424,6 +450,52 @@ const handleStatusChange = async (row, newStatus) => {
     if (error !== 'cancel') {
       ElMessage.error(`状态变更失败: ${error.message || error}`)
     }
+  }
+}
+
+const handleGenerateTeacherLink = async (row) => {
+  teacherLinkLoadingId.value = row.id
+  try {
+    const result = await getClassToken(row.t_id, 'tea_h5j')
+    if (result.code === '10000') {
+      const token = result.data.token
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      await navigator.clipboard.writeText(link)
+      ElMessageBox.alert(
+        `<div style="word-break:break-all;">${link}</div>`,
+        '老师上课链接（已复制到剪贴板）',
+        { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
+      )
+    } else {
+      ElMessage.error(`获取 token 失败: ${result.message || '未知错误'}`)
+    }
+  } catch (error) {
+    ElMessage.error(`请求失败: ${error.message}`)
+  } finally {
+    teacherLinkLoadingId.value = null
+  }
+}
+
+const handleGenerateClassLink = async (row) => {
+  classLinkLoadingId.value = row.id
+  try {
+    const result = await getClassToken(row.s_id)
+    if (result.code === '10000') {
+      const token = result.data.token
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      await navigator.clipboard.writeText(link)
+      ElMessageBox.alert(
+        `<div style="word-break:break-all;">${link}</div>`,
+        '学员上课链接（已复制到剪贴板）',
+        { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
+      )
+    } else {
+      ElMessage.error(`获取 token 失败: ${result.message || '未知错误'}`)
+    }
+  } catch (error) {
+    ElMessage.error(`请求失败: ${error.message}`)
+  } finally {
+    classLinkLoadingId.value = null
   }
 }
 
