@@ -19,10 +19,11 @@
 
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
         <el-form-item label="用户ID" prop="user_id">
-          <el-input
+          <HistoryInput
             v-model="form.user_id"
             placeholder="请输入用户ID"
             clearable
+            storage-key="pb-clear-plan_user_id"
             style="width: 300px" />
           <el-text type="info" size="small" style="margin-left: 10px;">
             输入需要清除绘本数据的用户ID

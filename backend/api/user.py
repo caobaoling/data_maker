@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify
 import sys
 import os
 import logging
+import re
 from datetime import datetime, timedelta
 
 # 配置日志
@@ -20,6 +21,17 @@ from common.db_connect import create_connection
 from common.get_crm_session import CRMClient
 
 user_bp = Blueprint('user', __name__)
+
+# CRM账号配置
+CRM_ACCOUNTS = {
+    'test': {'username': 'admin', 'password': '51talk20250227#'},
+    'prod': {'username': 'caobaoling', 'password': 'Test123$'}
+}
+
+def get_crm_client(env='test', base_url='https://crm.51suyang.cn'):
+    """根据环境获取对应账号的CRMClient"""
+    account = CRM_ACCOUNTS.get(env, CRM_ACCOUNTS['test'])
+    return CRMClient(username=account['username'], password=account['password'], base_url=base_url)
 
 # 财富类型配置
 WEALTH_TYPES = {
@@ -372,6 +384,161 @@ def query_arabic_tag():
             'msg': f'查询失败: {str(e)}',
             'data': None
         }), 500
+
+
+@user_bp.route('/get_mobile', methods=['POST'])
+def get_mobile():
+    """
+    通过用户ID获取手机号
+    参数:
+        user_id: 用户ID (必填)
+        region: 用户区域 (可选，domestic=境内/overseas=境外，默认domestic)
+    """
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+
+        logger.info(f"[获取手机号] 用户ID: {user_id}, 环境: {env}")
+
+        base_domain = 'crm.51suyang.cn'
+        client = get_crm_client(env, base_url=f'https://{base_domain}')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+
+        # 第一步：访问 update_email.php 页面，从 HTML 提取真实的 stu_id
+        page_url = f'https://{base_domain}/admin/user/update_email.php'
+        page_resp = session.get(page_url, params={'user_id': user_id}, verify=False, timeout=15)
+        page_resp.encoding = 'utf-8'
+
+        match = re.search(r"showUserView\('(\d+)',\s*'mobile'\)", page_resp.text)
+        if not match:
+            client.close()
+            return jsonify({'code': '500', 'msg': '无法从页面提取stu_id，请确认用户ID是否正确', 'data': None}), 500
+
+        stu_id = match.group(1)
+        logger.info(f"[获取手机号] 提取到 stu_id: {stu_id}")
+
+        # 第二步：用 stu_id 调用接口获取手机号
+        api_url = f'https://{base_domain}/admin/user/ajax_get_current_field.php'
+        response = session.post(api_url, data={'stu_id': stu_id, 'field': 'mobile'}, verify=False, timeout=15)
+        response.encoding = 'utf-8'
+        client.close()
+
+        mobile = response.text.strip()
+        logger.info(f"[获取手机号] 响应: {mobile}")
+
+        return jsonify({
+            'code': '0',
+            'msg': '获取成功',
+            'data': {
+                'user_id': user_id,
+                'mobile': mobile
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"[获取手机号] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'获取失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/add_overseas_label', methods=['POST'])
+def add_overseas_label():
+    """
+    为用户打海外标签
+    参数:
+        user_id: 用户ID (必填)
+        country_code: 国家代码 (可选，默认886)
+    """
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        country_code = data.get('country_code', '886')
+        env = data.get('env', 'test')
+
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+
+        logger.info(f"[打海外标签] 用户ID: {user_id}, country_code: {country_code}, 环境: {env}")
+
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+
+        url = f'https://junior.51talk.com/admin/Tools/addGlobalLabel'
+        params = {'id': user_id, 'country_code': country_code}
+        response = session.get(url, params=params, verify=False, timeout=15)
+        response.encoding = 'utf-8'
+        client.close()
+
+        logger.info(f"[打海外标签] 响应: {response.text[:200]}")
+
+        return jsonify({
+            'code': '0',
+            'msg': '操作成功',
+            'data': {
+                'user_id': user_id,
+                'country_code': country_code,
+                'raw': response.text
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"[打海外标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'操作失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/unlock_account', methods=['POST'])
+def unlock_account():
+    """
+    通过手机号解锁账户
+    参数:
+        username: 手机号或用户ID (必填)
+        region: 用户区域 (可选，domestic=境内/overseas=境外，默认domestic)
+    """
+    try:
+        data = request.json
+        username = data.get('username')
+        region = data.get('region', 'domestic')
+        env = data.get('env', 'test')
+
+        if not username:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+
+        logger.info(f"[解锁账户] username: {username}, 区域: {region}, 环境: {env}")
+
+        base_domain = 'crm.51suyang.cn' if region == 'domestic' else 'crm.51talk.com'
+        client = get_crm_client(env, base_url=f'https://{base_domain}')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+
+        url = f'https://{base_domain}/Admin/Sso/password'
+        params = {'username': username}
+        response = session.get(url, params=params, verify=False, timeout=15)
+        response.encoding = 'utf-8'
+        client.close()
+
+        logger.info(f"[解锁账户] 响应: {response.text[:200]}")
+
+        return jsonify({
+            'code': '0',
+            'msg': '解锁操作已发送',
+            'data': {
+                'username': username,
+                'region': region,
+                'raw': response.text
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"[解锁账户] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'解锁失败: {str(e)}', 'data': None}), 500
 
 
 @user_bp.route('/arabic_tag/add', methods=['POST'])

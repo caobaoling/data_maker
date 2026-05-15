@@ -18,18 +18,19 @@ logger = logging.getLogger(__name__)
 class CRMClient:
     """CRM系统客户端"""
 
-    def __init__(self, username='admin', password='51talk20250227#'):
+    def __init__(self, username='admin', password='51talk20250227#', base_url='https://crm.51talk.com'):
         """
         初始化CRM客户端
 
         Args:
             username: CRM用户名
             password: CRM密码
+            base_url: CRM域名（默认crm.51talk.com，境内用crm.51suyang.cn）
         """
         self.username = username
         self.password = password
         self.session = None
-        self.base_url = 'https://crm.51talk.com'
+        self.base_url = base_url
 
     def login(self):
         """

@@ -11,27 +11,29 @@
       <!-- 添加表单 -->
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="用户ID" prop="user_id">
-          <el-input
+          <HistoryInput
             v-model="form.user_id"
             placeholder="请输入用户ID"
             clearable
+            storage-key="elf-add-star_user_id"
             style="width: 500px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="预约ID" prop="appoint_id">
-          <el-input
+          <HistoryInput
             v-model="form.appoint_id"
             placeholder="请输入预约ID"
             clearable
+            storage-key="elf-add-star_appoint_id"
             style="width: 500px">
             <template #prepend>
               <el-icon><Document /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="星星数量" prop="star_num">

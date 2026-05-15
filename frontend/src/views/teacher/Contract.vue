@@ -11,15 +11,16 @@
       <!-- 添加表单 -->
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="老师ID" prop="teacher_id">
-          <el-input
+          <HistoryInput
             v-model="form.teacher_id"
             placeholder="请输入老师ID"
             clearable
+            storage-key="teacher-contract_teacher_id"
             style="width: 400px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item>

@@ -136,6 +136,12 @@ const routes = [
         meta: { title: '解除高风险', icon: 'Unlock' }
       },
       {
+        path: '/user/manage',
+        name: 'UserManage',
+        component: () => import('@/views/user/UserManage.vue'),
+        meta: { title: '用户管理', icon: 'UserFilled' }
+      },
+      {
         path: '/tools/wordcloud',
         name: 'WordCloud',
         component: () => import('@/views/tools/WordCloud.vue'),

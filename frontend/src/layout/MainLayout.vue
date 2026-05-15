@@ -142,6 +142,9 @@
             <el-menu-item index="/user/release-risk" @click="handleMenuClick('/user/release-risk', '解除高风险')">
               解除高风险
             </el-menu-item>
+            <el-menu-item index="/user/manage" @click="handleMenuClick('/user/manage', '用户管理')">
+              用户管理
+            </el-menu-item>
           </el-sub-menu>
 
           <el-sub-menu index="tools">

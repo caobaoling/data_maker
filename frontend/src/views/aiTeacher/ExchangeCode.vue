@@ -11,27 +11,29 @@
       <!-- 使用表单 -->
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="用户ID" prop="user_id">
-          <el-input
+          <HistoryInput
             v-model="form.user_id"
             placeholder="请输入用户ID"
             clearable
+            storage-key="exchange-code_user_id"
             style="width: 500px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="兑换码" prop="exchange_code">
-          <el-input
+          <HistoryInput
             v-model="form.exchange_code"
             placeholder="请输入兑换码，如: 37e6d355095ce3973e11f65d3949b8fa"
             clearable
+            storage-key="exchange-code_exchange_code"
             style="width: 500px">
             <template #prepend>
               <el-icon><Ticket /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item>

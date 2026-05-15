@@ -77,3 +77,45 @@ export function addArabicTag(data) {
     data
   })
 }
+
+/**
+ * 通过用户ID获取手机号
+ * @param {Object} data - 请求参数
+ * @param {string} data.user_id - 用户ID
+ * @param {string} data.region - 区域（domestic/overseas）
+ */
+export function getMobile(data) {
+  return request({
+    url: '/api/user/get_mobile',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 为用户打海外标签
+ * @param {Object} data - 请求参数
+ * @param {string} data.user_id - 用户ID
+ * @param {string} data.country_code - 国家代码
+ */
+export function addOverseasLabel(data) {
+  return request({
+    url: '/api/user/add_overseas_label',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 通过手机号解锁账户
+ * @param {Object} data - 请求参数
+ * @param {string} data.username - 手机号
+ * @param {string} data.region - 区域（domestic/overseas）
+ */
+export function unlockAccount(data) {
+  return request({
+    url: '/api/user/unlock_account',
+    method: 'post',
+    data
+  })
+}

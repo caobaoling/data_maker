@@ -10,15 +10,16 @@
 
       <el-form :model="form" :rules="rules" ref="formRef" label-width="140px">
         <el-form-item label="学员ID" prop="stu_id">
-          <el-input
+          <HistoryInput
             v-model="form.stu_id"
             placeholder="请输入学员ID"
             clearable
+            storage-key="order-manage_stu_id"
             style="width: 300px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="订单金额" prop="order_money">
@@ -34,12 +35,13 @@
         </el-form-item>
 
         <el-form-item label="商品ID" prop="goods_id">
-          <el-input
+          <HistoryInput
             v-model="form.goods_id"
             placeholder="请输入商品ID"
             clearable
+            storage-key="order-manage_goods_id"
             style="width: 300px">
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="订单类型" prop="order_type">
@@ -73,13 +75,14 @@
         </el-form-item>
 
         <el-form-item label="备注" prop="remark">
-          <el-input
+          <HistoryInput
             v-model="form.remark"
             type="textarea"
             :rows="3"
             placeholder="请输入备注信息"
-            clearable>
-          </el-input>
+            clearable
+            storage-key="order-manage_remark">
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item>

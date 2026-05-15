@@ -24,15 +24,16 @@
         </el-form-item>
 
         <el-form-item label="学员ID" prop="stu_id">
-          <el-input
+          <HistoryInput
             v-model="form.stu_id"
             placeholder="请输入学员ID"
             clearable
+            storage-key="release-risk_stu_id"
             style="width: 300px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="风险类型" prop="risk_type">
@@ -43,12 +44,13 @@
         </el-form-item>
 
         <el-form-item label="风险项ID" prop="risk_item">
-          <el-input
+          <HistoryInput
             v-model="form.risk_item"
             placeholder="请输入设备ID或用户ID，默认使用学员ID"
             clearable
+            storage-key="release-risk_risk_item"
             style="width: 300px">
-          </el-input>
+          </HistoryInput>
           <div class="form-tip">如不填写，默认使用学员ID</div>
         </el-form-item>
 

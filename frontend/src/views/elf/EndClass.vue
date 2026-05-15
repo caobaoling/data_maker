@@ -11,27 +11,29 @@
       <!-- 结课表单 -->
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="用户ID" prop="user_id">
-          <el-input
+          <HistoryInput
             v-model="form.user_id"
             placeholder="请输入用户ID"
             clearable
+            storage-key="elf-end-class_user_id"
             style="width: 500px">
             <template #prepend>
               <el-icon><User /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item label="业务ID" prop="biz_id">
-          <el-input
+          <HistoryInput
             v-model="form.biz_id"
             placeholder="请输入业务ID（约课ID）"
             clearable
+            storage-key="elf-end-class_biz_id"
             style="width: 500px">
             <template #prepend>
               <el-icon><Document /></el-icon>
             </template>
-          </el-input>
+          </HistoryInput>
         </el-form-item>
 
         <el-form-item>

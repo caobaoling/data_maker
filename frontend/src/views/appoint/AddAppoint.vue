@@ -21,13 +21,13 @@
         </el-form-item>
 
         <el-form-item label="学生ID" required>
-          <el-input v-model="form.stuId" placeholder="请输入学生ID" />
+          <HistoryInput v-model="form.stuId" placeholder="请输入学生ID" storage-key="add-appoint_stuId" />
         </el-form-item>
 
         <el-form-item label="教师ID" required>
-          <el-input v-model="form.teacherId" placeholder="请填写数字">
+          <HistoryInput v-model="form.teacherId" placeholder="请填写数字" storage-key="add-appoint_teacherId">
             <template #append>只能填写数字</template>
-          </el-input>
+          </HistoryInput>
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
             💡 提示: 请手动输入教师ID,只能填写数字
           </div>
@@ -84,15 +84,15 @@
 
         <el-form-item label="教材ID" required>
           <el-space direction="vertical" style="width: 100%">
-            <el-input v-model="form.levelId" placeholder="自动填充或手动输入">
+            <HistoryInput v-model="form.levelId" placeholder="自动填充或手动输入" storage-key="add-appoint_levelId">
               <template #prepend>一级教材ID (level_id)</template>
-            </el-input>
-            <el-input v-model="form.unitId" placeholder="自动填充或手动输入">
+            </HistoryInput>
+            <HistoryInput v-model="form.unitId" placeholder="自动填充或手动输入" storage-key="add-appoint_unitId">
               <template #prepend>二级教材ID (unit_id)</template>
-            </el-input>
-            <el-input v-model="form.courseId" placeholder="自动填充或手动输入">
+            </HistoryInput>
+            <HistoryInput v-model="form.courseId" placeholder="自动填充或手动输入" storage-key="add-appoint_courseId">
               <template #prepend>三级教材ID (course_id)</template>
-            </el-input>
+            </HistoryInput>
           </el-space>
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
             💡 切换课程类型会自动填充默认教材ID,也可手动修改
@@ -103,11 +103,11 @@
         <el-divider content-position="left">其他设置</el-divider>
 
         <el-form-item label="财富类型">
-          <el-input v-model="form.pointType" placeholder="自动计算或手动输入">
+          <HistoryInput v-model="form.pointType" placeholder="自动计算或手动输入" storage-key="add-appoint_pointType">
             <template #append>
               <el-button @click="form.pointType = getPointType()">重置为自动值</el-button>
             </template>
-          </el-input>
+          </HistoryInput>
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
             💡 默认根据课程类型自动计算，也可手动修改
           </div>
@@ -127,6 +127,27 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item v-if="form.teachType === 'WebAc'" label="界面语言">
+          <el-select v-model="form.langcode" style="width: 220px;">
+            <el-option label="英语 (en)" value="en" />
+            <el-option label="简体中文 (zh-CN)" value="zh-CN" />
+            <el-option label="繁体中文-香港 (zh-HK)" value="zh-HK" />
+            <el-option label="繁体中文-台湾 (zh-TW)" value="zh-TW" />
+            <el-option label="马来语 (ms)" value="ms" />
+            <el-option label="泰语 (th)" value="th" />
+            <el-option label="阿拉伯语-沙特 (ar-SA)" value="ar-SA" />
+            <el-option label="日语 (ja)" value="ja" />
+            <el-option label="土耳其语 (tr)" value="tr" />
+            <el-option label="西班牙语 (es)" value="es" />
+            <el-option label="越南语 (vi)" value="vi" />
+            <el-option label="印尼语 (id)" value="id" />
+            <el-option label="韩语 (ko)" value="ko" />
+            <el-option label="葡萄牙语-巴西 (pt-BR)" value="pt-BR" />
+            <el-option label="芬兰语 (fi)" value="fi" />
+            <el-option label="波兰语 (pl)" value="pl" />
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="预约状态">
           <el-select v-model="form.status">
             <el-option label="正常(on)" value="on" />
@@ -135,7 +156,7 @@
         </el-form-item>
 
         <el-form-item label="备注信息">
-          <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="选填" />
+          <HistoryInput v-model="form.remark" type="textarea" :rows="2" placeholder="选填" storage-key="add-appoint_remark" />
         </el-form-item>
 
         <!-- 参数预览 -->
@@ -302,6 +323,7 @@ const form = ref({
   pointType: '',  // 财富类型（空则自动计算）
   costNum: 1,  // 消耗数量（默认1）
   teachType: '51TalkAC',  // 上课方式（默认AC上课）
+  langcode: 'en',         // 界面语言（默认英语）
   status: 'on',
   remark: ''
 })
@@ -615,7 +637,7 @@ const generateClassLink = async () => {
     const result = await getClassToken(appointResult.value.stuId)
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}`
       await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
@@ -642,7 +664,7 @@ const generateTeacherLink = async () => {
     const result = await getClassToken(appointResult.value.teacherId, 'tea_h5j')
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}`
       await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
@@ -674,6 +696,7 @@ const resetForm = () => {
     pointType: '',  // 重置为空，自动计算
     costNum: 1,  // 重置为默认值1
     teachType: '51TalkAC',  // 上课方式（默认AC上课）
+    langcode: 'en',         // 界面语言（默认英语）
     status: 'on',
     remark: ''
   }

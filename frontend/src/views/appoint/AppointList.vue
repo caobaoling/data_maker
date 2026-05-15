@@ -9,16 +9,16 @@
       <div class="search-bar">
         <el-form :inline="true" :model="searchForm">
           <el-form-item label="预约ID">
-            <el-input v-model="searchForm.appointId" placeholder="请输入预约ID" clearable style="width: 160px" />
+            <HistoryInput v-model="searchForm.appointId" placeholder="请输入预约ID" clearable storage-key="appoint-list_appointId" style="width: 160px" />
           </el-form-item>
           <el-form-item label="学生ID">
-            <el-input v-model="searchForm.stuId" placeholder="请输入学生ID" clearable style="width: 160px" />
+            <HistoryInput v-model="searchForm.stuId" placeholder="请输入学生ID" clearable storage-key="appoint-list_stuId" style="width: 160px" />
           </el-form-item>
           <el-form-item label="教师ID">
-            <el-input v-model="searchForm.tId" placeholder="请输入教师ID" clearable style="width: 160px" />
+            <HistoryInput v-model="searchForm.tId" placeholder="请输入教师ID" clearable storage-key="appoint-list_tId" style="width: 160px" />
           </el-form-item>
           <el-form-item label="教材ID">
-            <el-input v-model="searchForm.courseId" placeholder="请输入教材ID" clearable style="width: 160px" />
+            <HistoryInput v-model="searchForm.courseId" placeholder="请输入教材ID" clearable storage-key="appoint-list_courseId" style="width: 160px" />
           </el-form-item>
           <el-form-item label="课程类型">
             <el-select v-model="searchForm.courseType" placeholder="请选择" clearable style="width: 180px">
@@ -77,6 +77,30 @@
             <el-button icon="Refresh" @click="handleReset">重置</el-button>
           </el-form-item>
         </el-form>
+      </div>
+
+      <!-- WebAc 上课链接语言选择 -->
+      <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; color: #606266;">上课链接语言：</span>
+        <el-select v-model="linkLangcode" style="width: 200px;" size="small">
+          <el-option label="英语 (en)" value="en" />
+          <el-option label="简体中文 (zh-CN)" value="zh-CN" />
+          <el-option label="繁体中文-香港 (zh-HK)" value="zh-HK" />
+          <el-option label="繁体中文-台湾 (zh-TW)" value="zh-TW" />
+          <el-option label="马来语 (ms)" value="ms" />
+          <el-option label="泰语 (th)" value="th" />
+          <el-option label="阿拉伯语-沙特 (ar-SA)" value="ar-SA" />
+          <el-option label="日语 (ja)" value="ja" />
+          <el-option label="土耳其语 (tr)" value="tr" />
+          <el-option label="西班牙语 (es)" value="es" />
+          <el-option label="越南语 (vi)" value="vi" />
+          <el-option label="印尼语 (id)" value="id" />
+          <el-option label="韩语 (ko)" value="ko" />
+          <el-option label="葡萄牙语-巴西 (pt-BR)" value="pt-BR" />
+          <el-option label="芬兰语 (fi)" value="fi" />
+          <el-option label="波兰语 (pl)" value="pl" />
+        </el-select>
+        <span style="font-size: 12px; color: #909399;">（生成学员/老师上课链接时使用）</span>
       </div>
 
       <!-- 数据表格 -->
@@ -235,6 +259,7 @@ const detailVisible = ref(false)
 const currentRow = ref(null)
 const classLinkLoadingId = ref(null)
 const teacherLinkLoadingId = ref(null)
+const linkLangcode = ref('en')
 
 const searchForm = ref({
   appointId: '',
@@ -283,7 +308,7 @@ const categoryMap = {
   'ph_buy': '菲教付费课',
   'ea_buy': '欧美付费课',
   'nat_free': '美小体验课',
-  
+
   'nat_buy': '美小付费课'
 }
 
@@ -353,8 +378,8 @@ const loadData = async () => {
     }
 
     // 检查是否有查询条件
-    const hasConditions = params.appointId || params.stuId || params.tId || 
-                          params.courseId || params.courseType || params.category || 
+    const hasConditions = params.appointId || params.stuId || params.tId ||
+                          params.courseId || params.courseType || params.category ||
                           params.status || params.startDate || params.endDate
 
     const result = await getAppointList(params)
@@ -362,7 +387,7 @@ const loadData = async () => {
     if (result.code === '10000') {
       tableData.value = result.data.list
       pagination.value.total = result.data.total
-      
+
       // 根据是否有查询条件显示不同提示
       if (!hasConditions && result.data.total === 100) {
         ElMessage.warning('未设置查询条件，仅显示最近100条数据。建议添加查询条件以获取精确结果。')
@@ -474,7 +499,7 @@ const handleGenerateTeacherLink = async (row) => {
     const result = await getClassToken(row.t_id, 'tea_h5j')
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}`
       await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
@@ -497,7 +522,7 @@ const handleGenerateClassLink = async (row) => {
     const result = await getClassToken(row.s_id)
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0`
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}`
       await copyToClipboard(link)
       ElMessageBox.alert(
         `<div style="word-break:break-all;">${link}</div>`,
