@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify
 import sys
 import os
 import logging
+import re
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -477,3 +478,54 @@ def reset_teacher_password():
     finally:
         if client:
             client.close()
+
+
+@teacher_bp.route('/get_tms_sso_url', methods=['POST'])
+def get_tms_sso_url():
+    """
+    获取 TMS SSO 跳转 URL
+    登录 CRM 后从响应中提取 TMS SSO URL，前端用此 URL 完成浏览器侧的 TMS session 建立
+    参数:
+        target_url: TMS 目标页面 URL (必填)
+    """
+    client = None
+    try:
+        data = request.json
+        target_url = data.get('target_url')
+
+        if not target_url:
+            return jsonify({'code': '400', 'msg': 'target_url 不能为空', 'data': None}), 400
+
+        logger.info(f"[TMS SSO] 获取 SSO URL，目标页面: {target_url}")
+
+        import hashlib
+        session = requests.Session()
+        session.verify = False
+
+        md5_pwd = hashlib.md5('51talk20250227#'.encode()).hexdigest()
+        resp = session.post(
+            'https://crm.51talk.com/admin/login.php',
+            data={'user_name': 'admin', 'password': md5_pwd, 'user_type': 'admin', 'login_type': 'tmp'},
+            allow_redirects=False,
+            timeout=15
+        )
+
+        match = re.search(r'window\.location\.href="(//tms\.51talk\.com[^"]+)"', resp.text)
+        if not match:
+            return jsonify({'code': '500', 'msg': 'CRM 登录失败或未获取到 SSO URL', 'data': None}), 500
+
+        sso_url = 'https:' + match.group(1)
+        logger.info(f"[TMS SSO] 获取到 SSO URL: {sso_url[:80]}...")
+
+        return jsonify({
+            'code': '0',
+            'msg': '获取成功',
+            'data': {
+                'sso_url': sso_url,
+                'target_url': target_url
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"[TMS SSO] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'获取失败: {str(e)}', 'data': None}), 500

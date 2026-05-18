@@ -112,6 +112,18 @@ const routes = [
         meta: { title: '查看老师邮箱', icon: 'Message' }
       },
       {
+        path: '/teacher/trial-occupy',
+        name: 'TrialOccupy',
+        component: () => import('@/views/teacher/TmsPage.vue'),
+        meta: { title: '体验老师占课', icon: 'Calendar', tmsUrl: 'https://tms.51talk.com/tools/mutiloccupiedFreeLesson' }
+      },
+      {
+        path: '/teacher/trial-assign',
+        name: 'TrialAssign',
+        component: () => import('@/views/teacher/TmsPage.vue'),
+        meta: { title: '分配体验老师', icon: 'UserFilled', tmsUrl: 'https://tms.51talk.com/FreeTrialLessonManagement/index' }
+      },
+      {
         path: '/user/add-wealth',
         name: 'AddWealth',
         component: () => import('@/views/user/AddWealth.vue'),

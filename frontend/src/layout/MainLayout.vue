@@ -123,6 +123,12 @@
             <el-menu-item index="/teacher/email" @click="handleMenuClick('/teacher/email', '查看老师邮箱')">
               查看老师邮箱
             </el-menu-item>
+            <el-menu-item index="/teacher/trial-occupy" @click="handleMenuClick('/teacher/trial-occupy', '体验老师占课')">
+              体验老师占课
+            </el-menu-item>
+            <el-menu-item index="/teacher/trial-assign" @click="handleMenuClick('/teacher/trial-assign', '分配体验老师')">
+              分配体验老师
+            </el-menu-item>
           </el-sub-menu>
 
           <el-sub-menu index="user">

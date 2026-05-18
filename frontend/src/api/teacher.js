@@ -35,3 +35,12 @@ export function resetTeacherPassword(data) {
     data
   })
 }
+
+// 获取 TMS SSO 跳转 URL
+export function getTmsSsoUrl(data) {
+  return request({
+    url: '/api/teacher/get_tms_sso_url',
+    method: 'post',
+    data
+  })
+}
