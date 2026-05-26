@@ -23,6 +23,38 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 tools_bp = Blueprint('tools', __name__)
 
+# config 目录路径（相对于项目根目录）
+CONFIG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../config'))
+
+# hosts 文件列表（按文件名展示）
+HOSTS_FILES = ['59环境.txt', '海外pre-jr.txt', '国内pre.txt', '国内灰度.txt']
+
+
+@tools_bp.route('/hosts_files', methods=['GET'])
+def get_hosts_files():
+    """获取所有 hosts 文件内容"""
+    result = []
+    for filename in HOSTS_FILES:
+        filepath = os.path.join(CONFIG_DIR, filename)
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+            result.append({
+                'name': filename.replace('.txt', ''),
+                'filename': filename,
+                'content': content
+            })
+        except Exception as e:
+            logger.error(f"[hosts文件] 读取 {filename} 失败: {e}")
+            result.append({
+                'name': filename.replace('.txt', ''),
+                'filename': filename,
+                'content': f'读取失败: {str(e)}'
+            })
+
+    return jsonify({'code': '0', 'msg': '获取成功', 'data': result})
+
+
 # ========== 优化后的中文字体路径配置 ==========
 # 1. 按优先级排序：系统默认字体 > 通用字体目录 > 项目自定义字体目录
 # 2. 覆盖 Windows（多语言版本）、Linux（主流发行版）、macOS

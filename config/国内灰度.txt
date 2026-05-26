@@ -1,0 +1,43 @@
+#前端 灰度
+59.110.148.159 vi.51talk.com 
+59.110.148.159 ms.51talk.com 
+59.110.148.159 cn.51talk.com 
+59.110.148.159 en.51talk.com 
+59.110.148.159 zh.51talk.com 
+59.110.148.159 hk.51talk.com 
+59.110.148.159 tw.51talk.com
+59.110.148.159 www.51talk.com
+59.110.148.159 trial.51talk.com
+# 172.16.0.45 cdn.51talk.com cdn.51suyang.cn
+59.110.148.159 home.51talk.cn
+#接口灰度
+59.110.148.159 appi.51talk.com 
+59.110.148.159 appi.51suyang.cn 
+
+59.110.148.159 vc.51talk.com
+#59.110.148.159 aci.51talk.com  www.51talkac.com
+#59.110.148.159  aci.51talk.com acproxyhk.51talk.com  www.51talkac.com 
+10.90.96.206 igateway.51talk.me igateway.51suyang.cn igateway.51talk.cnpre
+59.110.148.159 appkidi.51talk.com stucenter.51talk.com appkidi.51talk.cn   appsuyang.51suyang.cn 
+59.110.148.159 stucenter.51talk.me appkidi.51suyang.cn
+59.110.148.159 junior.51talk.com junior.51talk.me junior.51suyang.cn junior.51talk.cn
+#10.0.1.125         www.51talk.com 
+59.110.148.159 resources.51talk.cn
+59.110.148.159 resources.51talk.com resources.51talk.me resources.51suyang.cn
+59.110.148.159 cadmin.51talk.com cadmin.51suyang.cn
+10.0.1.125 aci.51talk.com acproxyhk.51talk.com www.51talkac.com
+#59.110.148.159 data.service.51talk.com
+101.201.69.191 data.service.51talk.com
+59.110.148.159 wechat.51talk.com 
+10.0.2.103 i.51talk.com
+10.0.1.144  appi.51talkglobal.com
+60.205.82.90   gk.51talk.com
+
+#sso   pre
+# 60.205.220.250 login.51talk.com login.51suyang.cn sso.51suyang.cn
+# 60.205.220.250 i.login.51talk.com i.login.51suyang.cn
+
+# 59.110.148.159 act.51talk.com act.51suyang.cn
+59.110.148.159 sale.51talk.com sale.51suyang.cn sale.51talk.cn
+
+59.110.148.159 pay.51talk.com pay.51suyang.cn pay.51talk.cn

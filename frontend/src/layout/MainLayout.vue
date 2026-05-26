@@ -158,14 +158,18 @@
               <el-icon><Tools /></el-icon>
               <span>其他功能</span>
             </template>
-            <el-menu-item index="/tools/wordcloud" @click="handleMenuClick('/tools/wordcloud', '词云生成')">
+            <!-- 词云生成暂时隐藏 -->
+            <!-- <el-menu-item index="/tools/wordcloud" @click="handleMenuClick('/tools/wordcloud', '词云生成')">
               词云生成
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/tools/number-formatter" @click="handleMenuClick('/tools/number-formatter', '数字格式化')">
               数字格式化
             </el-menu-item>
             <el-menu-item index="/tools/url-unquote" @click="handleMenuClick('/tools/url-unquote', '转义URL')">
               转义URL
+            </el-menu-item>
+            <el-menu-item index="/tools/hosts" @click="handleMenuClick('/tools/hosts', 'Hosts文件')">
+              Hosts文件
             </el-menu-item>
           </el-sub-menu>
         </el-menu>

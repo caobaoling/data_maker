@@ -160,6 +160,12 @@ const routes = [
         meta: { title: '词云生成', icon: 'Cloudy' }
       },
       {
+        path: '/tools/hosts',
+        name: 'HostsViewer',
+        component: () => import('@/views/tools/HostsViewer.vue'),
+        meta: { title: 'Hosts文件', icon: 'Document' }
+      },
+      {
         path: '/tools/number-formatter',
         name: 'NumberFormatter',
         component: () => import('@/views/tools/NumberFormatter.vue'),

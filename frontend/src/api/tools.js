@@ -8,3 +8,11 @@ export function generateWordCloud(data) {
     data
   })
 }
+
+// 获取 hosts 文件列表
+export function getHostsFiles() {
+  return request({
+    url: '/api/tools/hosts_files',
+    method: 'get'
+  })
+}

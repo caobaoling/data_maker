@@ -100,9 +100,25 @@ import { Phone } from '@element-plus/icons-vue'
 import { getMobile, addOverseasLabel, unlockAccount } from '@/api/user'
 
 const copyMobile = (mobile) => {
-  navigator.clipboard.writeText(mobile).then(() => {
-    ElMessage.success('已复制到剪贴板')
-  })
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(mobile).then(() => {
+      ElMessage.success('已复制到剪贴板')
+    })
+  } else {
+    const textarea = document.createElement('textarea')
+    textarea.value = mobile
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    try {
+      document.execCommand('copy')
+      ElMessage.success('已复制到剪贴板')
+    } finally {
+      document.body.removeChild(textarea)
+    }
+  }
 }
 
 // 获取手机号

@@ -78,7 +78,7 @@
             <el-option label="Cocos (book_type=2)" value="2" />
           </el-select>
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
-            💡 选择Cocos时，教材ID(course_id)会自动设置为1801191，并在预约成功后同步更新相关数据库
+            💡 选择Cocos时，教材ID(course_id)会自动设置为1883121，并在预约成功后同步更新相关数据库
           </div>
         </el-form-item>
 
@@ -441,8 +441,8 @@ const onUsePointChange = () => {
 const onBookTypeChange = () => {
   if (form.value.bookType === '2') {
     // Cocos教材：固定course_id=1801191
-    form.value.courseId = '1801191'
-    ElMessage.success('已选择Cocos教材，course_id已自动设置为1801191')
+    form.value.courseId = '1883121'
+    ElMessage.success('已选择Cocos教材，course_id已自动设置为1883121')
   } else {
     // 切换回非Cocos教材：恢复当前课程类型+性质对应的默认course_id
     updateCourseIds()
@@ -613,18 +613,22 @@ const syncCocos = async () => {
 }
 
 const copyToClipboard = async (text) => {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
+  // 优先使用 Clipboard API（需要 HTTPS 或 localhost）
+  if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text)
-  } else {
-    const el = document.createElement('textarea')
-    el.value = text
-    el.style.position = 'fixed'
-    el.style.opacity = '0'
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
+    return
   }
+  // 移动端兼容方案：用 setSelectionRange 替代 select()
+  const el = document.createElement('textarea')
+  el.value = text
+  el.setAttribute('readonly', '')
+  el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;'
+  document.body.appendChild(el)
+  el.focus()
+  el.setSelectionRange(0, el.value.length)
+  const ok = document.execCommand('copy')
+  document.body.removeChild(el)
+  if (!ok) throw new Error('execCommand failed')
 }
 
 const generateClassLink = async () => {
@@ -637,11 +641,12 @@ const generateClassLink = async () => {
     const result = await getClassToken(appointResult.value.stuId)
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}`
-      await copyToClipboard(link)
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.stuId}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}&mock=1&console=1&mockData=1`
+      let copied = true
+      try { await copyToClipboard(link) } catch { copied = false }
       ElMessageBox.alert(
-        `<div style="word-break:break-all;">${link}</div>`,
-        '学员上课链接（已复制到剪贴板）',
+        `<div style="word-break:break-all;user-select:all;">${link}</div>`,
+        copied ? '学员上课链接（已复制到剪贴板）' : '学员上课链接（复制失败，请长按链接手动复制）',
         { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
       )
     } else {
@@ -664,11 +669,12 @@ const generateTeacherLink = async () => {
     const result = await getClassToken(appointResult.value.teacherId, 'tea_h5j')
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}`
-      await copyToClipboard(link)
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${appointResult.value.appointId}&relId=${appointResult.value.teacherId}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${form.value.langcode}&mock=1&console=1&mockData=1`
+      let copied = true
+      try { await copyToClipboard(link) } catch { copied = false }
       ElMessageBox.alert(
-        `<div style="word-break:break-all;">${link}</div>`,
-        '老师上课链接（已复制到剪贴板）',
+        `<div style="word-break:break-all;user-select:all;">${link}</div>`,
+        copied ? '老师上课链接（已复制到剪贴板）' : '老师上课链接（复制失败，请长按链接手动复制）',
         { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
       )
     } else {

@@ -1,0 +1,246 @@
+# 59测试机
+# 统一测试环境
+
+27.159.90.80 cdn.bootcdn.net
+117.68.67.83 cdn.bootcss.com
+
+#VoIP环境
+# 172.16.72.61 smartcrm.51talk.com crm.51talk.com crmapi.51talk.com
+# 172.16.0.45 cdn.51talk.com cdn.51suyang.cn
+172.16.70.59 appglobal-sg.51talk.me
+
+# 172.16.0.190 crmapi.51talk.com
+#172.16.70.59 vc.51talk.com  bbs.51talk.com
+172.16.70.59 apina.51talk.com aa.51talk.com usa.51talk.com
+172.16.70.59 www.51talkjr.com
+172.16.70.59 www.51talk.com wap.51talk.com adult.51talk.com wap.51suyang.cn wap.51talkjr.com
+172.16.70.59 home.51talk.com
+172.16.70.59 mc.51talk.com
+172.16.70.59 om.51talk.com om.51suyang.cn
+# 172.16.0.56	 otm.51talk.com otm.51talk.me
+172.16.70.59 cadmin.51talk.com cadmin.51suyang.cn
+# 微信服务号
+172.16.70.59 wechat.51talk.com  wechat.51talk.me
+# 172.16.0.103 junior.51talk.com
+172.16.0.103 sentry.51talk.com
+# 黑鸟
+172.16.0.92   wxchat.51talk.com
+# ABtest系统
+172.16.72.116 cdp.51talk.com
+#权限系统
+172.16.0.43 oauth.51talk.com
+172.16.0.43 oauth.51talk.me
+#Docker
+172.16.16.57 hub.51talk.com 
+# 配置解析
+172.16.72.42 mirrors.51talk.com
+
+# 消息网关
+172.16.0.54  mg.51talk.com 
+172.16.0.54  mg.51talk.me
+# 外教端
+172.16.16.58 58pbm.51talk.com
+172.16.0.54 salary.51talk.xhprof.com
+172.16.0.54 s.51talk.com
+172.16.0.54 ip.51talk.com
+
+# 订阅
+172.16.0.54 subscription.51talk.com subscription.51talk.me
+#172.16.70.59 translate.51talk.com
+172.16.70.59 pay.51talk.com pay.51talkjr.com
+# SVC
+# 172.16.72.48 svc.51suyang.cn
+172.16.100.191 laravel.51talk.com
+172.16.0.91 plat.51talk.com
+172.16.0.47 local.51talk.com
+# 172.16.0.54 otm.51talk.com
+172.16.0.33 api.51talk.com
+#服务引擎
+172.16.0.87 se.51talk.com
+172.16.0.228 data.service.51talk.com
+172.16.0.221 callcenter.51talk.com
+# block系统
+# 172.16.0.45 bms.51talk.com
+
+#App需要的接口
+172.16.70.59 appkidi.51suyang.cn appkidi.51talk.cn appkidi.51talk.com appkidi.51talk.me appkidi.51talkjr.com
+172.16.70.59 appkidi.51huiben.cn
+172.16.70.59 appigsi.51talk.com
+172.16.70.59 appi.51talkglobal.com  appi.51suyang.cn appi.51talk.com stucenter.51talk.com stucenter.51talk.me 
+172.16.70.59 appteai.51talk.com
+
+172.16.70.59 aci.51talk.com aci.51suyang.cn www.51talkac.com acproxyhk.51talk.com  acproxyhk.51suyang.cn acisg.51talk.com acisg.51talkjr.com
+172.16.70.59  course.51talk.com course.51suyang.cn course.51talk.cn course.51speaking.cn course.51talkjr.com 
+172.16.70.59 trial.51talk.com  trial.51suyang.cn   trial.51talk.cn trial.51talkjr.com 
+172.16.70.103 gk.51talk.com
+#172.16.0.54 erpapi.51talk.com
+#172.16.0.193 erpapi.51talk.com
+172.16.70.59 resources.51talk.com resources.51talk.me resources.51suyang.cn resources.51talkjr.com
+172.16.70.59 act.51talk.com  act.51suyang.cn act.51talk.me act.51talkjr.com
+172.16.70.59 wechat.51talk.com
+172.16.70.59 bbs.51talk.com bbs.51suyang.cn
+172.16.70.59 junior.51suyang.cn  junior.51talk.com  junior.51talk.me junior.51talk.cn  junior.51talkjr.com
+172.16.70.59 sale.51talk.com sale.51suyang.cn sale.51talkjr.com
+
+#登录时需要绑定的p
+172.16.0.65 i.login.51talk.com i.login.51suyang.cn i.login.51talk.me i.login.51suyang.me login.51talkjr.com
+172.16.0.65 login.51huiben.cn
+172.16.0.65 loginstu.51talk.com login.51talk.cn login.51talk.com login.51suyang.cn login.51talk.com.my logincn.51talk.com
+172.16.0.65 sso.51talk.com sso.51suyang.cn sso.51speaking.cn sso.51huiben.c
+172.16.0.65 i.sso.51talk.com
+172.16.0.65 o1i6817454.iok.la
+
+
+
+172.16.70.59  www.51suyang.cn
+#172.16.70.103 ip.51talk.com
+
+#静态资源配置
+172.16.0.96 one.frontend.com
+172.16.0.96 old1.frontend.com old2.frontend.com single.frontend.com olduc.frontend.com static.frontend.com one.frontend.com
+172.16.0.45 cdn.51talk.com  cdn.51suyang.cn cdn.51talk.cn cdn.51talk.com.my cdn.51talkjr.com
+172.16.0.45 bms.51suyang.cn test.jenkins.51suyang.cn  
+# 172.16.0.96 static.51talk.com static.51talk.cn
+172.16.0.45 tf.51talk.cn tf.51suyang.cn tf.51talk.com 
+172.16.0.45  bms.51suyang.cn test.jenkins.51suyang.cn   test.jenkins.51talk.com  
+172.16.0.45 studybag.51talk.com  
+
+#kg ng kgservice
+172.16.0.45 kg.51talk.com kgservice.51talk.com console.ccs.51talk.com api.ccs.51talk.com
+
+10.0.2.216   eva.51talk.me	
+172.16.70.51 learning.service.51talk.com     learning.service.51talk.me
+# 172.16.0.107 itextbook.51talk.com
+172.16.16.162 cyt.51talk.com
+172.16.70.59 stupci.51talk.com
+172.16.0.107 kg.51talk.com kgservice.51talk.com kgservice.51talk.me  
+172.16.0.107 console.ccs.51talk.com s.ccs.51talk.com api.ccs.51talk.com
+172.16.72.116  cdp.51italk.com
+
+# java的平台
+172.16.16.97 i.51talk.com i.51talk.me  i.51talk.comjr
+# 172.16.16.36 i.51talk.com i.51talk.me 
+
+172.16.16.97 igateway.51talk.com igateway.51suyang.cn igateway.51talkjr.com igateway-cn.51talk.com  igateway.51talk.me 
+172.16.16.97 pbm.51talk.com pbm.51suyang.cn 
+172.16.16.97 timetable-history.51talk.me  timetable-history.51talk.com
+172.16.16.97 igateway.51huiben.cn
+# S9内容中台
+172.16.16.97    pbm-test.51talk.com pbm-dev.51talk.com game-test.51talk.com
+
+59.110.114.227 pre-ams.51suyang.cn
+192.168.30.223 pre-lp.51talkjr.com
+59.110.83.34 pre-lp.51suyang.cn lp.51suyang.cn
+
+192.168.30.223 pre-lp.51talkjr.com
+
+172.16.16.31 www.51hawo.com
+# 加盟商小程序
+172.16.0.190 crmeb.51talk.com
+
+### TMS	###
+172.16.0.54 tms.51talk.com
+172.16.0.54 tmp.51talk.com
+172.16.0.54 mypage.51talk.com
+172.16.0.54 cmn.51talk.com tms.ph.51talk.com cnm.ph.51talk.com
+172.16.0.54 erpapi.51talk.com  appteai.51talk.com
+172.16.0.54 erpapi.51talk.test
+172.16.0.54 d.51talk.com
+# ### CRM	###
+# 172.16.72.61    crm.51talk.com crm.51talkjr.com
+# 172.16.72.61    crmreport.51talk.com  crmreport.51talkjr.com
+# 172.16.72.61    crmreportapp.51talk.com  crmreportapp.51talkjr.com
+# 172.16.72.61    crmit.51talk.com crmit.51talkjr.com
+# 172.16.72.61    crmbj.51talk.com crmbj.51talkjr.com
+# # 172.16.72.62    distribution.51talk.com
+# # 172.16.72.61    crm.51suyang.cn
+# 172.16.72.61    crmreport.51suyang.cn
+# 172.16.72.61    crmreportapp.51suyang.cn
+# 172.16.72.61    crmit.51suyang.cn
+# 172.16.72.61    crmbj.51suyang.cn
+# # 172.16.72.61    distribution.51suyang.cn
+# #工作台
+# 172.16.72.61    crmcst.51talk.com 
+# 172.16.72.61    smartcrm.51talk.com smartcrm.51talkjr.com
+# 172.16.72.61    crmapi.51talk.com crmapi.51talkjr.com
+# 172.16.72.61    crmapi.51talk.me crmapi.51talkjr.me
+# 172.16.72.62    crmapis.51talk.com
+# 172.16.72.62    crmapis.51talk.me
+# 172.16.72.61    crmcst.51suyang.cn
+# 172.16.72.61    smartcrm.51suyang.cn
+# 172.16.72.61    crmapi.51suyang.cn
+# 172.16.72.61    crm.51suyang.cn crmapi.51suyang.cn  crmapi.51suyang.me
+
+# # CR
+# 172.16.72.61    cr.51talk.com cr.51talkjr.com
+# 172.16.72.61    cr.51suyang.cn
+
+#172.16.70.59 crm.51talk.com crm.51suyang.cn smartcrm.51talk.com smartcrm.51suyang.cn 
+
+### CRM	###
+# 172.16.0.190 ip.51talk.com
+# 172.16.0.190 crm.51talk.com crm.51talk.me
+172.16.70.59    crm.51talk.com crm.51talkjr.com
+172.16.70.59    crmreport.51talk.com  crmreport.51talkjr.com
+172.16.70.59    crmreportapp.51talk.com  crmreportapp.51talkjr.com
+172.16.70.59    crmit.51talk.com crmit.51talkjr.com
+172.16.70.59    crmbj.51talk.com crmbj.51talkjr.com
+# 172.16.70.59    distribution.51talk.com
+# 172.16.70.59    crm.51suyang.cn
+172.16.70.59    crmreport.51suyang.cn
+172.16.70.59    crmreportapp.51suyang.cn
+172.16.70.59    crmit.51suyang.cn
+172.16.70.59    crmbj.51suyang.cn
+# 172.16.70.59    distribution.51suyang.cn
+#工作台
+172.16.70.59    crmcst.51talk.com 
+172.16.70.59    smartcrm.51talk.com smartcrm.51talkjr.com
+172.16.70.59    crmapi.51talk.com crmapi.51talkjr.com
+172.16.70.59    crmapi.51talk.me crmapi.51talkjr.me
+172.16.70.59    crmapis.51talk.com
+172.16.70.59    crmapis.51talk.me
+172.16.70.59    crmcst.51suyang.cn
+172.16.70.59    smartcrm.51suyang.cn
+172.16.70.59    crmapi.51suyang.cn
+172.16.70.59    crm.51suyang.cn crmapi.51suyang.cn  crmapi.51suyang.me
+
+# CR
+172.16.70.59    cr.51talk.com cr.51talkjr.com
+172.16.70.59    cr.51suyang.cn
+#suyang.cn
+172.16.70.59 imaisi.51talk.com
+
+172.16.70.103 tpadmin.51talk.com
+172.16.70.59 cadmin.51talkjr.com
+
+172.16.70.59 vi.51talk.com 
+172.16.70.59 ms.51talk.com 
+172.16.70.59 id.51talk.com
+172.16.70.59 cn.51talk.com 
+172.16.70.59 en.51talk.com 
+172.16.70.59 zh.51talk.com 
+172.16.70.59 hk.51talk.com 
+172.16.70.59 tw.51talk.com
+172.16.70.59 ar.51talk.com
+172.16.70.59 www.51talk.cn
+172.16.70.59 zh.51talk.com.my
+172.16.70.59 www.51talk.com.my
+172.16.70.59 trial.51talk.com.my
+172.16.70.59 appkidi.51talk.com.my 
+172.16.70.59 appigsi.51talk.com 
+172.16.70.59 appsuyang.51suyang.cn
+172.16.70.59 acicn.51talk.cn
+172.16.70.59 web.51talk.cn
+172.16.72.116 cdp.51suyang.cn
+172.16.70.51  classinfo.service.51talk.com
+
+#国际中文
+# 172.16.0.181 appcni.51talkglobal.com
+172.16.70.59 appcni.51talkglobal.com
+
+
+# 内容中台 - 前端试卷
+10.90.96.45   content.51suyang.cn   
+# 订阅制学员注册
+192.168.30.19 learn.51talk.com tr.51talk.com
+

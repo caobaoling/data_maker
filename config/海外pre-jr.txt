@@ -1,0 +1,165 @@
+# 老师端的静态文件
+27.159.90.80 cdn.bootcdn.net
+117.68.67.83 cdn.bootcss.com
+192.168.30.228 cr.51talk.com cr.51talkjr.com
+192.168.24.108 www.51talkim.com wap.51talkim.com  sale.51talkim.com course.51talkim.com trial.51talkim.com
+192.168.24.108 www.51talkjr.com
+192.168.24.108 pre.51talk.com 
+192.168.24.108 preom.51talk.com mc.51talk.com
+192.168.24.108 home.51talk.com yinggao.51talk.com
+192.168.24.108 wap.51talk.com act.51talk.com wap.51talkjr.com
+192.168.24.108 sale.51talk.com
+192.168.24.108 om.51talk.com
+192.168.24.108 bbs.51talk.com
+192.168.24.108 yx.51talk.com
+192.168.24.108 prelog.51talk.com
+192.168.24.108 prekid.51talk.com
+192.168.24.108 adult.51talk.com aa.51talk.com 51talk.com
+192.168.24.108 www.xhprof.com
+192.168.24.108 web.51talk.com efl.51talk.com
+192.168.24.108 erpapi.51talk.com
+# 192.168.30.64 crm.51talk.com 
+192.168.24.108 crmapi.51talk.com
+192.168.24.108 smartcrm.51talk.com
+192.168.24.108 crmreport.51talk.com
+192.168.24.108 crmreportapp.51talk.com
+192.168.24.108 cadmin.51talk.com 
+192.168.24.108 cadmin.51talkjr.com
+192.168.24.108 static-sg.51talk.com
+192.168.24.108 apina.51talk.com
+192.168.24.108 appoint.service.51talk.com
+192.168.24.108 user.service.51talk.com
+192.168.24.108 teacher.service.51talk.com
+192.168.24.108 assetincome.service.51talk.com
+192.168.24.108 java.service.51talk.com
+192.168.24.108 book.service.51talk.com
+192.168.24.108 wechat.51talk.com
+192.168.24.108 landing.51talk.com
+#  公海 
+# 192.168.30.64 crm.51talk.com 
+# 192.168.24.108  crm.51talk.com 
+#  海外tmk工作台地址 
+192.168.30.217 ct.51talk.com
+
+
+192.168.24.108 appi.51talk.com appkidi.51talk.com  appkidi.51talk.me appglobal-sg.51talk.me
+192.168.24.108 appkidi.51talkjr.com 
+192.168.24.108 appi.51talkglobal.com www.51talkglobal.com
+
+# 59.110.148.159 appkidi.51suyang.cn   #灰度环境
+
+10.0.3.161 appi.51talk.me
+10.0.3.161 monitor.service.51talk.com
+101.201.69.191 acproxyhk.51talk.com
+60.205.86.84 cscc.51talk.com
+192.168.27.5 gk.51talk.com
+10.90.96.161  overseas.51talk.com
+# static pre
+# 101.201.69.191 static.51talk.com static.51suyang.cn
+# 39.105.9.13 static.51suyang.cn
+#境内
+39.105.9.13 pre.51suyang.cn crm.51suyang.cn
+39.105.9.13 preom.51suyang.cn mc.51suyang.cn
+39.105.9.13 home.51suyang.cn yinggao.51suyang.cn
+39.105.9.13 wap.51suyang.cn act.51suyang.cn
+39.105.9.13 sale.51suyang.cn
+39.105.9.13	course.51suyang.cn
+39.105.9.13 om.51suyang.cn
+39.105.9.13 bbs.51suyang.cn
+39.105.9.13 yx.51suyang.cn
+39.105.9.13 prelog.51suyang.cn
+39.105.9.13 prekid.51suyang.cn
+39.105.9.13 www.51suyang.cn adult.51suyang.cn aa.51suyang.cn 51suyang.cn
+39.105.9.13 junior.51suyang.cn
+39.105.9.13 web.51suyang.cn efl.51suyang.cn
+39.105.9.13 erpapi.51suyang.cn
+39.105.9.13 cadmin.51suyang.cn
+39.105.9.13 trial.51suyang.cn course.51suyang.cn 
+39.105.9.13 apina.51suyang.cn
+10.0.3.161 monitor.service.51suyang.cn
+39.105.9.13 appoint.service.51suyang.cn
+39.105.9.13 user.service.51suyang.cn
+39.105.9.13 teacher.service.51suyang.cn
+39.105.9.13 assetincome.service.51suyang.cn
+39.105.9.13 java.service.51suyang.cn
+39.105.9.13 book.service.51suyang.cn
+39.105.9.13 wechat.51suyang.cn
+39.105.9.13 landing.51suyang.cn
+39.105.9.13  aci.51suyang.cn acproxyhk.51suyang.cn
+39.105.9.13 appi.51suyang.cn
+39.105.9.13	appkidi.51suyang.cn
+39.105.9.13 pay.51suyang.cn
+# 39.105.9.13 resources.51suyang.cn
+
+#境外
+192.168.24.108 vi.51talk.com
+192.168.24.108 ms.51talk.com
+192.168.24.108 cn.51talk.com
+192.168.24.108 en.51talk.com
+192.168.24.108 zh.51talk.com
+192.168.24.108 hk.51talk.com
+192.168.24.108 tw.51talk.com
+192.168.24.108 ar.51talk.com
+192.168.24.108 th.51talk.com
+192.168.24.108 id.51talk.com
+192.168.24.108 www.51talk.com
+192.168.24.108 zh.51talk.com.my
+192.168.24.108 www.51talk.com.my
+192.168.24.108 trial.51talk.com.my
+192.168.24.108 appkidi.51talk.com.my
+#java
+# 192.168.24.78 i.51talk.com i.51talk.comjr i.51talk.me
+192.168.24.106 i.51talk.com i.51talk.comjr i.51talk.me 
+
+#境外
+192.168.30.100 pbm.51talk.com 
+#境内
+10.90.96.243 pbm.51suyang.cn
+192.168.30.86 igateway.51talk.com igateway.51talk.me  igateway.51talk.cnpre igateway.51talkjr.com
+#java 境内
+10.90.96.206 igateway.51suyang.cn igateway-cn.51talk.com  
+10.90.96.206 igateway.51huiben.cn
+#前端
+192.168.24.108 sso.51talk.com
+192.168.24.108 www.51talkac.com acicn.51talk.cn
+101.201.69.191  acicn.51talk.cn  aci.51suyang.cn  www.51talkac.com   www.51suyang.cn 
+192.168.24.108 aci.51talk.com acisg.51talk.com  aci.51talk.me acisg.51talkjr.com aci.51talkjr.com
+101.201.69.191 www.51talk.cn
+192.168.30.161 www.51talk.jp
+60.205.220.250 login.51suyang.cn sso.51suyang.cn logincn.51talk.com
+192.168.30.152 mg.51talk.com
+192.168.24.108 act.51talk.com act.51talkjr.com 
+192.168.24.108 resources.51talk.com resources.51talkjr.com resources.51talk.me
+192.168.24.108 login.51talk.com login.51talkjr.com
+192.168.24.108 www.51talkjr.com
+192.168.24.108 pay.51talk.com pay.51talkjr.com
+192.168.24.108 trial.51talk.com trial.51talkjr.com 
+192.168.24.108 course.51talk.com  course.51talkjr.com 
+192.168.24.107 trial.51talk.jp
+192.168.24.108 junior.51talk.com junior.51talkjr.com
+192.168.27.5   gk.51talk.com  gk.51talkjr.com
+
+
+#老师相关 均走的国内
+101.201.69.191  pre.51talk.com  
+101.201.69.191  cnm.51talk.com  
+101.201.69.191  tms.51talk.com  
+101.201.69.191  tms.ph.51talk.com
+101.201.69.191  tmp.51talk.com  
+#101.201.69.191  crm.51talk.com  
+101.201.69.191  www.51talk.com
+101.201.69.191  mypage.51talk.com
+101.201.69.191  mypagew.51talk.com  
+101.201.69.191  erpapi.51talk.com
+101.201.69.191  erpapi.51talk.me
+
+#前端pre
+10.90.96.87 crmp.51suyang.cn
+192.168.30.17 pre-crmp.51talkjr.com
+
+59.110.83.34 pre-lp.51suyang.cn
+59.110.83.34 pre-lp.51suyang.cn lp.51suyang.cn
+59.110.114.227 pre-ams.51suyang.cn ams.51suyang.cn
+192.168.30.224 pre-ams.51talkjr.com ams.51talkjr.com
+192.168.30.223 pre-lp.51talkjr.com lp.51talkjr.com
+

@@ -479,18 +479,22 @@ const handleStatusChange = async (row, newStatus) => {
 }
 
 const copyToClipboard = async (text) => {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
+  // 优先使用 Clipboard API（需要 HTTPS 或 localhost）
+  if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text)
-  } else {
-    const el = document.createElement('textarea')
-    el.value = text
-    el.style.position = 'fixed'
-    el.style.opacity = '0'
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
+    return
   }
+  // 移动端兼容方案：用 contenteditable + setSelectionRange
+  const el = document.createElement('textarea')
+  el.value = text
+  el.setAttribute('readonly', '')
+  el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;'
+  document.body.appendChild(el)
+  el.focus()
+  el.setSelectionRange(0, el.value.length)
+  const ok = document.execCommand('copy')
+  document.body.removeChild(el)
+  if (!ok) throw new Error('execCommand failed')
 }
 
 const handleGenerateTeacherLink = async (row) => {
@@ -499,11 +503,12 @@ const handleGenerateTeacherLink = async (row) => {
     const result = await getClassToken(row.t_id, 'tea_h5j')
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}`
-      await copyToClipboard(link)
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.t_id}&role=tea&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}&mock=1&console=1&mockData=1`
+      let copied = true
+      try { await copyToClipboard(link) } catch { copied = false }
       ElMessageBox.alert(
-        `<div style="word-break:break-all;">${link}</div>`,
-        '老师上课链接（已复制到剪贴板）',
+        `<div style="word-break:break-all;user-select:all;">${link}</div>`,
+        copied ? '老师上课链接（已复制到剪贴板）' : '老师上课链接（复制失败，请长按链接手动复制）',
         { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
       )
     } else {
@@ -522,11 +527,12 @@ const handleGenerateClassLink = async (row) => {
     const result = await getClassToken(row.s_id)
     if (result.code === '10000') {
       const token = result.data.token
-      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}`
-      await copyToClipboard(link)
+      const link = `https://cloud_classroom.middletest.51suyang.cn/?appointId=${row.id}&relId=${row.s_id}&role=stu&javaCourseType=1&token=${token}&buildver=web-1.0.0&langcode=${linkLangcode.value}&mock=1&console=1&mockData=1`
+      let copied = true
+      try { await copyToClipboard(link) } catch { copied = false }
       ElMessageBox.alert(
-        `<div style="word-break:break-all;">${link}</div>`,
-        '学员上课链接（已复制到剪贴板）',
+        `<div style="word-break:break-all;user-select:all;">${link}</div>`,
+        copied ? '学员上课链接（已复制到剪贴板）' : '学员上课链接（复制失败，请长按链接手动复制）',
         { dangerouslyUseHTMLString: true, confirmButtonText: '关闭' }
       )
     } else {
