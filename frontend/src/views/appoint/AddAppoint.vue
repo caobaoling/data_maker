@@ -64,14 +64,7 @@
         <!-- 课程信息 -->
         <el-divider content-position="left">课程信息</el-divider>
 
-        <el-form-item label="课程性质">
-          <el-radio-group v-model="form.usePoint" @change="onUsePointChange">
-            <el-radio label="free">体验课(free)</el-radio>
-            <el-radio label="buy">付费课(buy)</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item v-if="form.usePoint === 'free'" label="教材类型">
+        <el-form-item label="教材类型">
           <el-select v-model="form.bookType" @change="onBookTypeChange" style="width: 200px;">
             <el-option label="PDF (book_type=0)" value="0" />
             <el-option label="H5 (book_type=1)" value="1" />
@@ -80,6 +73,13 @@
           <div style="color: #909399; font-size: 12px; margin-top: 5px;">
             💡 选择Cocos时，教材ID(course_id)会自动设置为1883121，并在预约成功后同步更新相关数据库
           </div>
+        </el-form-item>
+
+        <el-form-item label="课程性质">
+          <el-radio-group v-model="form.usePoint" @change="onUsePointChange">
+            <el-radio label="free">体验课(free)</el-radio>
+            <el-radio label="buy">付费课(buy)</el-radio>
+          </el-radio-group>
         </el-form-item>
 
         <el-form-item label="教材ID" required>
