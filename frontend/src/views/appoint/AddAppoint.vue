@@ -411,13 +411,16 @@ const courseLoading = ref(false)
 // 反查加载状态
 const ancestorLoading = ref(false)
 
-// 查询子节点，返回 children 数组
+// 查询子节点，返回 { node, children } 结构
 const fetchSubtree = async (id) => {
   const res = await axios.get(`/textbook/series_textbook/query_subtree_by_id`, { params: { id } })
   if (res.data?.code === '10000') {
-    return res.data.res?.children || []
+    return {
+      node: res.data.res,
+      children: res.data.res?.children || []
+    }
   }
-  return []
+  return { node: null, children: [] }
 }
 
 // 查询祖先，返回 { node, parent } 结构
@@ -440,22 +443,25 @@ const parseTreePath = (treePath) => {
   }
 }
 
-// 加载一级教材：用当前 levelId 查子树得到兄弟节点（即先查父节点的子树）
-// 策略：直接查 levelId 对应节点的子树作为二级；一级列表通过 ancestor 接口的 parent 获取同级
+// 加载一级教材列表：用 subtree 接口查当前 levelId，从返回节点的 tree_parent_id 获取父节点id，
+// 再查父节点的子树得到所有一级兄弟；若 tree_parent_id=0 则当前节点已是顶级，单独作为选项
 const loadLevelOptions = async () => {
   levelLoading.value = true
   try {
-    // 先通过 ancestor 接口获取当前 levelId 的父节点，再用父节点查子树得到所有一级兄弟
     const currentLevelId = form.value.levelId || '1161041'
-    const ancestorData = await fetchAncestor(currentLevelId)
-    const parentId = ancestorData?.parent?.id
-    if (parentId) {
-      levelOptions.value = await fetchSubtree(parentId)
+    const { node } = await fetchSubtree(currentLevelId)
+    if (!node) {
+      levelOptions.value = []
+      return
+    }
+    const parentId = node.tree_parent_id
+    if (parentId && String(parentId) !== '0') {
+      // 查父节点的子树，得到所有一级兄弟节点
+      const { children } = await fetchSubtree(parentId)
+      levelOptions.value = children
     } else {
-      // 当前节点已是顶级，直接作为一个选项
-      if (ancestorData) {
-        levelOptions.value = [{ id: ancestorData.id, name: ancestorData.name }]
-      }
+      // 已是顶级节点，单独作为选项
+      levelOptions.value = [{ id: node.id, name: node.name }]
     }
   } catch (e) {
     ElMessage.error('加载一级教材失败')
@@ -473,7 +479,8 @@ const onLevelChange = async (val) => {
   if (!val) return
   unitLoading.value = true
   try {
-    unitOptions.value = await fetchSubtree(val)
+    const { children } = await fetchSubtree(val)
+    unitOptions.value = children
   } catch (e) {
     ElMessage.error('加载二级教材失败')
   } finally {
@@ -488,7 +495,8 @@ const onUnitChange = async (val) => {
   if (!val) return
   courseLoading.value = true
   try {
-    courseOptions.value = await fetchSubtree(val)
+    const { children } = await fetchSubtree(val)
+    courseOptions.value = children
   } catch (e) {
     ElMessage.error('加载三级教材失败')
   } finally {
@@ -561,7 +569,8 @@ const syncCascadeFromCurrent = async () => {
   if (form.value.levelId) {
     unitLoading.value = true
     try {
-      unitOptions.value = await fetchSubtree(form.value.levelId)
+      const { children } = await fetchSubtree(form.value.levelId)
+      unitOptions.value = children
     } catch (e) { /* ignore */ } finally {
       unitLoading.value = false
     }
@@ -570,7 +579,8 @@ const syncCascadeFromCurrent = async () => {
   if (form.value.unitId) {
     courseLoading.value = true
     try {
-      courseOptions.value = await fetchSubtree(form.value.unitId)
+      const { children } = await fetchSubtree(form.value.unitId)
+      courseOptions.value = children
     } catch (e) { /* ignore */ } finally {
       courseLoading.value = false
     }
