@@ -83,62 +83,35 @@
         </el-form-item>
 
         <el-form-item label="教材选择">
-          <el-radio-group v-model="textbookMode" @change="onTextbookModeChange" style="margin-bottom: 10px;">
-            <el-radio-button value="cascade">级联选择</el-radio-button>
-            <el-radio-button value="input">直接输入ID</el-radio-button>
-          </el-radio-group>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+            <el-radio-group v-model="textbookMode" @change="onTextbookModeChange">
+              <el-radio-button value="cascade">级联选择</el-radio-button>
+              <el-radio-button value="input">直接输入ID</el-radio-button>
+            </el-radio-group>
+          </div>
 
           <!-- 模式一：级联下拉 -->
           <template v-if="textbookMode === 'cascade'">
             <el-space direction="vertical" style="width: 100%">
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">一级教材 (level_id)</span></template>
-                <el-select
-                  v-model="form.levelId"
-                  filterable
-                  clearable
-                  placeholder="请选择一级教材"
-                  style="width: 100%"
-                  :loading="levelLoading"
-                  @change="onLevelChange"
-                >
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">一级教材 (level_id)</span>
+                <el-select v-model="form.levelId" filterable clearable placeholder="请选择一级教材" style="width: 500px;" :loading="levelLoading" @change="onLevelChange">
                   <el-option v-for="item in levelOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
                 </el-select>
-                <template #append>
-                  <el-button :loading="levelLoading" @click="loadLevelOptions">刷新</el-button>
-                </template>
-              </el-input-group>
-
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">二级教材 (unit_id)</span></template>
-                <el-select
-                  v-model="form.unitId"
-                  filterable
-                  clearable
-                  placeholder="请先选择一级教材"
-                  style="width: 100%"
-                  :loading="unitLoading"
-                  :disabled="!form.levelId"
-                  @change="onUnitChange"
-                >
+                <el-button :loading="levelLoading" @click="loadLevelOptions">刷新</el-button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">二级教材 (unit_id)</span>
+                <el-select v-model="form.unitId" filterable clearable placeholder="请先选择一级教材" style="width: 500px;" :loading="unitLoading" :disabled="!form.levelId" @change="onUnitChange">
                   <el-option v-for="item in unitOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
                 </el-select>
-              </el-input-group>
-
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">三级教材 (course_id)</span></template>
-                <el-select
-                  v-model="form.courseId"
-                  filterable
-                  clearable
-                  placeholder="请先选择二级教材"
-                  style="width: 100%"
-                  :loading="courseLoading"
-                  :disabled="!form.unitId"
-                >
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">三级教材 (course_id)</span>
+                <el-select v-model="form.courseId" filterable clearable placeholder="请先选择二级教材" style="width: 500px;" :loading="courseLoading" :disabled="!form.unitId">
                   <el-option v-for="item in courseOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
                 </el-select>
-              </el-input-group>
+              </div>
             </el-space>
             <div style="color: #909399; font-size: 12px; margin-top: 5px;">
               💡 选择一级后自动加载二级，选择二级后自动加载三级
@@ -148,36 +121,20 @@
           <!-- 模式二：直接输入ID反查 -->
           <template v-else>
             <el-space direction="vertical" style="width: 100%">
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">一级教材ID (level_id)</span></template>
-                <el-input v-model="form.levelId" placeholder="自动填充或手动输入" />
-              </el-input-group>
-
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">二级教材ID (unit_id)</span></template>
-                <el-input
-                  v-model="form.unitId"
-                  placeholder="输入后自动查询一级"
-                  :loading="ancestorLoading"
-                  @blur="onUnitIdBlur"
-                />
-                <template #append>
-                  <el-button :loading="ancestorLoading" @click="onUnitIdBlur">查询</el-button>
-                </template>
-              </el-input-group>
-
-              <el-input-group style="width: 100%">
-                <template #prepend><span style="width: 160px; display: inline-block;">三级教材ID (course_id)</span></template>
-                <el-input
-                  v-model="form.courseId"
-                  placeholder="输入后自动回填一级和二级"
-                  :loading="ancestorLoading"
-                  @blur="onCourseIdBlur"
-                />
-                <template #append>
-                  <el-button :loading="ancestorLoading" @click="onCourseIdBlur">查询</el-button>
-                </template>
-              </el-input-group>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">一级教材ID (level_id)</span>
+                <el-input v-model="form.levelId" placeholder="自动填充或手动输入" style="width: 500px;" />
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">二级教材ID (unit_id)</span>
+                <el-input v-model="form.unitId" placeholder="输入后自动查询一级" style="width: 500px;" @blur="onUnitIdBlur" />
+                <el-button :loading="ancestorLoading" @click="onUnitIdBlur">查询</el-button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #606266;">三级教材ID (course_id)</span>
+                <el-input v-model="form.courseId" placeholder="输入后自动回填一级和二级" style="width: 500px;" @blur="onCourseIdBlur" />
+                <el-button :loading="ancestorLoading" @click="onCourseIdBlur">查询</el-button>
+              </div>
             </el-space>
             <div style="color: #909399; font-size: 12px; margin-top: 5px;">
               💡 输入二级或三级ID后点击查询/失焦，自动反查并填充上级ID
