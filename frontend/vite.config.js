@@ -15,6 +15,11 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5001',
         changeOrigin: true
+      },
+      '/textbook': {
+        target: 'http://172.16.16.97',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/textbook/, '/talkplatform_textbook_consumer')
       }
     }
   },

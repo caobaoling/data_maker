@@ -82,21 +82,107 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="教材ID" required>
-          <el-space direction="vertical" style="width: 100%">
-            <HistoryInput v-model="form.levelId" placeholder="自动填充或手动输入" storage-key="add-appoint_levelId">
-              <template #prepend>一级教材ID (level_id)</template>
-            </HistoryInput>
-            <HistoryInput v-model="form.unitId" placeholder="自动填充或手动输入" storage-key="add-appoint_unitId">
-              <template #prepend>二级教材ID (unit_id)</template>
-            </HistoryInput>
-            <HistoryInput v-model="form.courseId" placeholder="自动填充或手动输入" storage-key="add-appoint_courseId">
-              <template #prepend>三级教材ID (course_id)</template>
-            </HistoryInput>
-          </el-space>
-          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
-            💡 切换课程类型会自动填充默认教材ID,也可手动修改
-          </div>
+        <el-form-item label="教材选择">
+          <el-radio-group v-model="textbookMode" @change="onTextbookModeChange" style="margin-bottom: 10px;">
+            <el-radio-button value="cascade">级联选择</el-radio-button>
+            <el-radio-button value="input">直接输入ID</el-radio-button>
+          </el-radio-group>
+
+          <!-- 模式一：级联下拉 -->
+          <template v-if="textbookMode === 'cascade'">
+            <el-space direction="vertical" style="width: 100%">
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">一级教材 (level_id)</span></template>
+                <el-select
+                  v-model="form.levelId"
+                  filterable
+                  clearable
+                  placeholder="请选择一级教材"
+                  style="width: 100%"
+                  :loading="levelLoading"
+                  @change="onLevelChange"
+                >
+                  <el-option v-for="item in levelOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
+                </el-select>
+                <template #append>
+                  <el-button :loading="levelLoading" @click="loadLevelOptions">刷新</el-button>
+                </template>
+              </el-input-group>
+
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">二级教材 (unit_id)</span></template>
+                <el-select
+                  v-model="form.unitId"
+                  filterable
+                  clearable
+                  placeholder="请先选择一级教材"
+                  style="width: 100%"
+                  :loading="unitLoading"
+                  :disabled="!form.levelId"
+                  @change="onUnitChange"
+                >
+                  <el-option v-for="item in unitOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
+                </el-select>
+              </el-input-group>
+
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">三级教材 (course_id)</span></template>
+                <el-select
+                  v-model="form.courseId"
+                  filterable
+                  clearable
+                  placeholder="请先选择二级教材"
+                  style="width: 100%"
+                  :loading="courseLoading"
+                  :disabled="!form.unitId"
+                >
+                  <el-option v-for="item in courseOptions" :key="item.id" :label="`[${item.id}] ${item.name}`" :value="String(item.id)" />
+                </el-select>
+              </el-input-group>
+            </el-space>
+            <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+              💡 选择一级后自动加载二级，选择二级后自动加载三级
+            </div>
+          </template>
+
+          <!-- 模式二：直接输入ID反查 -->
+          <template v-else>
+            <el-space direction="vertical" style="width: 100%">
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">一级教材ID (level_id)</span></template>
+                <el-input v-model="form.levelId" placeholder="自动填充或手动输入" />
+              </el-input-group>
+
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">二级教材ID (unit_id)</span></template>
+                <el-input
+                  v-model="form.unitId"
+                  placeholder="输入后自动查询一级"
+                  :loading="ancestorLoading"
+                  @blur="onUnitIdBlur"
+                />
+                <template #append>
+                  <el-button :loading="ancestorLoading" @click="onUnitIdBlur">查询</el-button>
+                </template>
+              </el-input-group>
+
+              <el-input-group style="width: 100%">
+                <template #prepend><span style="width: 160px; display: inline-block;">三级教材ID (course_id)</span></template>
+                <el-input
+                  v-model="form.courseId"
+                  placeholder="输入后自动回填一级和二级"
+                  :loading="ancestorLoading"
+                  @blur="onCourseIdBlur"
+                />
+                <template #append>
+                  <el-button :loading="ancestorLoading" @click="onCourseIdBlur">查询</el-button>
+                </template>
+              </el-input-group>
+            </el-space>
+            <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+              💡 输入二级或三级ID后点击查询/失焦，自动反查并填充上级ID
+            </div>
+          </template>
         </el-form-item>
 
         <!-- 其他设置 -->
@@ -301,6 +387,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { addAppointCn, addAppointEn, syncCocosBookType, getClassToken } from '@/api/appoint'
+import axios from 'axios'
 
 const loading = ref(false)
 const cocosLoading = ref(false)
@@ -309,6 +396,186 @@ const teacherLinkLoading = ref(false)
 
 // 预约结果数据
 const appointResult = ref(null)
+
+// ===== 教材选择相关 =====
+const textbookMode = ref('input') // 'cascade' | 'input'
+
+// 级联下拉数据
+const levelOptions = ref([])
+const unitOptions = ref([])
+const courseOptions = ref([])
+const levelLoading = ref(false)
+const unitLoading = ref(false)
+const courseLoading = ref(false)
+
+// 反查加载状态
+const ancestorLoading = ref(false)
+
+// 查询子节点，返回 children 数组
+const fetchSubtree = async (id) => {
+  const res = await axios.get(`/textbook/series_textbook/query_subtree_by_id`, { params: { id } })
+  if (res.data?.code === '10000') {
+    return res.data.res?.children || []
+  }
+  return []
+}
+
+// 查询祖先，返回 { node, parent } 结构
+const fetchAncestor = async (id) => {
+  const res = await axios.get(`/textbook/series_textbook/query_ancestor_by_id`, { params: { id } })
+  if (res.data?.code === '10000') {
+    return res.data.res || null
+  }
+  return null
+}
+
+// 从 tree_path 解析各层级id，格式 "0,level,unit,course"
+const parseTreePath = (treePath) => {
+  if (!treePath) return {}
+  const parts = treePath.split(',').filter(p => p !== '0')
+  return {
+    levelId: parts[0] || '',
+    unitId: parts[1] || '',
+    courseId: parts[2] || ''
+  }
+}
+
+// 加载一级教材：用当前 levelId 查子树得到兄弟节点（即先查父节点的子树）
+// 策略：直接查 levelId 对应节点的子树作为二级；一级列表通过 ancestor 接口的 parent 获取同级
+const loadLevelOptions = async () => {
+  levelLoading.value = true
+  try {
+    // 先通过 ancestor 接口获取当前 levelId 的父节点，再用父节点查子树得到所有一级兄弟
+    const currentLevelId = form.value.levelId || '1161041'
+    const ancestorData = await fetchAncestor(currentLevelId)
+    const parentId = ancestorData?.parent?.id
+    if (parentId) {
+      levelOptions.value = await fetchSubtree(parentId)
+    } else {
+      // 当前节点已是顶级，直接作为一个选项
+      if (ancestorData) {
+        levelOptions.value = [{ id: ancestorData.id, name: ancestorData.name }]
+      }
+    }
+  } catch (e) {
+    ElMessage.error('加载一级教材失败')
+  } finally {
+    levelLoading.value = false
+  }
+}
+
+// 选择一级后加载二级
+const onLevelChange = async (val) => {
+  form.value.unitId = ''
+  form.value.courseId = ''
+  unitOptions.value = []
+  courseOptions.value = []
+  if (!val) return
+  unitLoading.value = true
+  try {
+    unitOptions.value = await fetchSubtree(val)
+  } catch (e) {
+    ElMessage.error('加载二级教材失败')
+  } finally {
+    unitLoading.value = false
+  }
+}
+
+// 选择二级后加载三级
+const onUnitChange = async (val) => {
+  form.value.courseId = ''
+  courseOptions.value = []
+  if (!val) return
+  courseLoading.value = true
+  try {
+    courseOptions.value = await fetchSubtree(val)
+  } catch (e) {
+    ElMessage.error('加载三级教材失败')
+  } finally {
+    courseLoading.value = false
+  }
+}
+
+// 输入二级ID后反查一级（tree_depth=2，parent 是一级）
+const onUnitIdBlur = async () => {
+  const id = form.value.unitId
+  if (!id) return
+  ancestorLoading.value = true
+  try {
+    const data = await fetchAncestor(id)
+    if (data) {
+      // 用 tree_path 解析
+      const parsed = parseTreePath(data.tree_path)
+      if (parsed.levelId) {
+        form.value.levelId = parsed.levelId
+        ElMessage.success(`已自动填充一级教材ID: ${parsed.levelId}`)
+      } else if (data.parent?.id) {
+        form.value.levelId = String(data.parent.id)
+        ElMessage.success(`已自动填充一级教材ID: ${data.parent.id}`)
+      }
+    }
+  } catch (e) {
+    ElMessage.error('查询祖先节点失败')
+  } finally {
+    ancestorLoading.value = false
+  }
+}
+
+// 输入三级ID后反查一级和二级（tree_path: "0,level,unit,course"）
+const onCourseIdBlur = async () => {
+  const id = form.value.courseId
+  if (!id) return
+  ancestorLoading.value = true
+  try {
+    const data = await fetchAncestor(id)
+    if (data) {
+      const parsed = parseTreePath(data.tree_path)
+      if (parsed.levelId) form.value.levelId = parsed.levelId
+      if (parsed.unitId) form.value.unitId = parsed.unitId
+      if (parsed.levelId || parsed.unitId) {
+        ElMessage.success(`已自动填充：一级=${parsed.levelId}，二级=${parsed.unitId}`)
+      }
+    }
+  } catch (e) {
+    ElMessage.error('查询祖先节点失败')
+  } finally {
+    ancestorLoading.value = false
+  }
+}
+
+// 切换教材选择模式
+const onTextbookModeChange = (mode) => {
+  if (mode === 'cascade') {
+    syncCascadeFromCurrent()
+  }
+}
+
+// 根据当前三个 ID 同步级联下拉数据（无论哪种模式都调用）
+// 直接输入模式：用 tree_path 回填已有，无需额外操作（ID已在form里）
+// 级联模式：需要加载各级下拉选项并选中当前值
+const syncCascadeFromCurrent = async () => {
+  if (textbookMode.value !== 'cascade') return
+  // 加载一级列表
+  await loadLevelOptions()
+  // 加载二级列表（基于当前 levelId）
+  if (form.value.levelId) {
+    unitLoading.value = true
+    try {
+      unitOptions.value = await fetchSubtree(form.value.levelId)
+    } catch (e) { /* ignore */ } finally {
+      unitLoading.value = false
+    }
+  }
+  // 加载三级列表（基于当前 unitId）
+  if (form.value.unitId) {
+    courseLoading.value = true
+    try {
+      courseOptions.value = await fetchSubtree(form.value.unitId)
+    } catch (e) { /* ignore */ } finally {
+      courseLoading.value = false
+    }
+  }
+}
 
 const form = ref({
   courseType: '1',  // 默认英语课程
@@ -356,7 +623,7 @@ const dateTime = computed(() => {
   return `${dateStr}_${timeNum}`
 })
 
-// 根据课程类型和课程性质更新教材ID
+// 根据课程类型和课程性质更新教材ID，并同步级联/反查
 const updateCourseIds = () => {
   const courseType = form.value.courseType
   const usePoint = form.value.usePoint
@@ -392,6 +659,8 @@ const updateCourseIds = () => {
     form.value.levelId = '20000'
     form.value.unitId = '607292'
   }
+  // 三个 ID 已确定，同步级联下拉（级联模式才执行）
+  syncCascadeFromCurrent()
 }
 
 const onCourseTypeChange = () => {
@@ -440,11 +709,15 @@ const onUsePointChange = () => {
 
 const onBookTypeChange = () => {
   if (form.value.bookType === '2') {
-    // Cocos教材：固定course_id=1801191
+    // Cocos教材：固定三级ID，同时设置对应的一二级
     form.value.courseId = '1883121'
-    ElMessage.success('已选择Cocos教材，course_id已自动设置为1883121')
+    form.value.unitId = '1799471'
+    form.value.levelId = '20000'
+    // 同步级联下拉
+    syncCascadeFromCurrent()
+    ElMessage.success('已选择Cocos教材，教材ID已自动设置')
   } else {
-    // 切换回非Cocos教材：恢复当前课程类型+性质对应的默认course_id
+    // 切换回非Cocos教材：恢复当前课程类型+性质对应的默认教材ID（内部已调用 syncCascadeFromCurrent）
     updateCourseIds()
     const label = form.value.bookType === '0' ? 'PDF' : 'H5'
     ElMessage.success(`已切换为${label}教材，教材ID已恢复默认值`)
