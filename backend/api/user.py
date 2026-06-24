@@ -446,50 +446,212 @@ def get_mobile():
         return jsonify({'code': '500', 'msg': f'获取失败: {str(e)}', 'data': None}), 500
 
 
+def _parse_overseas_label_response(text):
+    """
+    解析 PHP var_dump 格式的响应，提取所有 code 值
+    响应可能包含一个或两个 array：
+      - 查询/删除：一个 array，code=10000 表示有标签，60024 表示无标签
+      - 添加：两个 array，第一个是添加前状态，第二个是操作结果
+    返回 {'codes': [str, ...], 'has_label': bool, 'first_code': str}
+    """
+    import re
+    codes = re.findall(r'\["code"\]=>\s*string\(\d+\)\s*"(\d+)"', text)
+    first_code = codes[0] if codes else ''
+    has_label = (first_code == '10000')
+    return {'codes': codes, 'first_code': first_code, 'has_label': has_label}
+
+
+def _call_label_api(session, user_id, types, action=None):
+    """
+    调用标签接口，对指定 types 列表分别请求
+    action=1 添加，action=2 删除，不传 action 为查询
+    返回 {type: parsed_dict, ...}
+    """
+    base_url = 'https://www.51talk.com/Admin/Masy/getAttributeBySid'
+    results = {}
+    for label_type in types:
+        params = {'user_id': user_id, 'type': label_type}
+        if action is not None:
+            params['action'] = action
+        resp = session.get(base_url, params=params, verify=False, timeout=15)
+        resp.encoding = 'utf-8'
+        results[label_type] = _parse_overseas_label_response(resp.text)
+        logger.info(f"[标签] type={label_type}, action={action}, 响应: {resp.text[:200]}")
+    return results
+
+
+def _call_overseas_label_api(session, user_id, action=None):
+    return _call_label_api(session, user_id, ('overseas', 'global'), action)
+
+
 @user_bp.route('/add_overseas_label', methods=['POST'])
 def add_overseas_label():
     """
-    为用户打海外标签
+    为用户打海外标签（overseas + global），action=1
     参数:
         user_id: 用户ID (必填)
-        country_code: 国家代码 (可选，默认886)
     """
     try:
         data = request.json
         user_id = data.get('user_id')
-        country_code = data.get('country_code', '886')
         env = data.get('env', 'test')
 
         if not user_id:
             return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
 
-        logger.info(f"[打海外标签] 用户ID: {user_id}, country_code: {country_code}, 环境: {env}")
+        logger.info(f"[添加海外标签] 用户ID: {user_id}")
 
         client = get_crm_client(env, base_url='https://crm.51talk.com')
         session = client.get_session()
         if not session:
             return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
 
-        url = f'https://junior.51talk.com/admin/Tools/addGlobalLabel'
-        params = {'id': user_id, 'country_code': country_code}
-        response = session.get(url, params=params, verify=False, timeout=15)
-        response.encoding = 'utf-8'
+        results = _call_overseas_label_api(session, user_id, action=1)
         client.close()
-
-        logger.info(f"[打海外标签] 响应: {response.text[:200]}")
 
         return jsonify({
             'code': '0',
             'msg': '操作成功',
-            'data': {
-                'user_id': user_id,
-                'country_code': country_code,
-                'raw': response.text
-            }
+            'data': {'user_id': user_id, 'overseas': results['overseas'], 'global': results['global']}
         })
 
     except Exception as e:
-        logger.error(f"[打海外标签] 错误: {e}")
+        logger.error(f"[添加海外标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'操作失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/query_overseas_label', methods=['POST'])
+def query_overseas_label():
+    """
+    查询用户海外标签（overseas + global），不传 action
+    参数:
+        user_id: 用户ID (必填)
+    """
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+
+        logger.info(f"[查询海外标签] 用户ID: {user_id}")
+
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+
+        results = _call_overseas_label_api(session, user_id, action=None)
+        client.close()
+
+        return jsonify({
+            'code': '0',
+            'msg': '查询成功',
+            'data': {'user_id': user_id, 'overseas': results['overseas'], 'global': results['global']}
+        })
+
+    except Exception as e:
+        logger.error(f"[查询海外标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'查询失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/delete_overseas_label', methods=['POST'])
+def delete_overseas_label():
+    """
+    删除用户海外标签（overseas + global），action=2
+    参数:
+        user_id: 用户ID (必填)
+    """
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+
+        logger.info(f"[删除海外标签] 用户ID: {user_id}")
+
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+
+        results = _call_overseas_label_api(session, user_id, action=2)
+        client.close()
+
+        return jsonify({
+            'code': '0',
+            'msg': '操作成功',
+            'data': {'user_id': user_id, 'overseas': results['overseas'], 'global': results['global']}
+        })
+
+    except Exception as e:
+        logger.error(f"[删除海外标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'操作失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/query_cocos_label', methods=['POST'])
+def query_cocos_label():
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+        logger.info(f"[查询Cocos标签] 用户ID: {user_id}")
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+        results = _call_label_api(session, user_id, ('cocos',), action=None)
+        client.close()
+        return jsonify({'code': '0', 'msg': '查询成功', 'data': {'user_id': user_id, 'cocos': results['cocos']}})
+    except Exception as e:
+        logger.error(f"[查询Cocos标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'查询失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/add_cocos_label', methods=['POST'])
+def add_cocos_label():
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+        logger.info(f"[添加Cocos标签] 用户ID: {user_id}")
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+        results = _call_label_api(session, user_id, ('cocos',), action=1)
+        client.close()
+        return jsonify({'code': '0', 'msg': '操作成功', 'data': {'user_id': user_id, 'cocos': results['cocos']}})
+    except Exception as e:
+        logger.error(f"[添加Cocos标签] 错误: {e}")
+        return jsonify({'code': '500', 'msg': f'操作失败: {str(e)}', 'data': None}), 500
+
+
+@user_bp.route('/delete_cocos_label', methods=['POST'])
+def delete_cocos_label():
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        env = data.get('env', 'test')
+        if not user_id:
+            return jsonify({'code': '400', 'msg': '用户ID不能为空', 'data': None}), 400
+        logger.info(f"[删除Cocos标签] 用户ID: {user_id}")
+        client = get_crm_client(env, base_url='https://crm.51talk.com')
+        session = client.get_session()
+        if not session:
+            return jsonify({'code': '500', 'msg': '登录失败，无法获取session', 'data': None}), 500
+        results = _call_label_api(session, user_id, ('cocos',), action=2)
+        client.close()
+        return jsonify({'code': '0', 'msg': '操作成功', 'data': {'user_id': user_id, 'cocos': results['cocos']}})
+    except Exception as e:
+        logger.error(f"[删除Cocos标签] 错误: {e}")
         return jsonify({'code': '500', 'msg': f'操作失败: {str(e)}', 'data': None}), 500
 
 

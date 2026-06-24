@@ -653,6 +653,13 @@ const onCourseTypeChange = () => {
 }
 
 const onUsePointChange = () => {
+  // 当前是Cocos教材时，切换课程性质不重置bookType，直接应用Cocos对应ID
+  if (form.value.bookType === '2') {
+    onBookTypeChange()
+    const usePointName = form.value.usePoint === 'buy' ? '付费课' : '体验课'
+    ElMessage.success(`已切换为${usePointName}，Cocos教材ID已自动调整`)
+    return
+  }
   // 切换到付费课时，重置教材类型为PDF(不需要同步)并恢复教材ID
   if (form.value.usePoint === 'buy') {
     form.value.bookType = '0'
@@ -676,10 +683,17 @@ const onUsePointChange = () => {
 
 const onBookTypeChange = () => {
   if (form.value.bookType === '2') {
-    // Cocos教材：固定三级ID，同时设置对应的一二级
-    form.value.courseId = '1883121'
-    form.value.unitId = '1799471'
-    form.value.levelId = '20000'
+    if (form.value.usePoint === 'buy') {
+      // Cocos教材 + 付费课：使用指定默认教材ID
+      form.value.levelId = '1912011'
+      form.value.unitId = '1912021'
+      form.value.courseId = '1912031'
+    } else {
+      // Cocos教材 + 体验课：固定使用体验课专用Cocos教材ID
+      form.value.levelId = '20000'
+      form.value.unitId = '607292'
+      form.value.courseId = '1883121'
+    }
     // 同步级联下拉
     syncCascadeFromCurrent()
     ElMessage.success('已选择Cocos教材，教材ID已自动设置')

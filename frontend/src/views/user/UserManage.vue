@@ -35,20 +35,19 @@
       </div>
     </el-card>
 
-    <!-- 打海外标签 -->
+    <!-- 海外标签管理 -->
     <el-card class="action-card">
       <template #header>
-        <span><strong>打海外标签</strong>（通过用户ID）</span>
+        <span><strong>海外标签管理</strong>（通过用户ID）</span>
       </template>
       <el-form :model="labelForm" label-width="100px" @submit.prevent>
         <el-form-item label="用户ID">
           <HistoryInput v-model="labelForm.user_id" placeholder="请输入用户ID" clearable storage-key="user-manage_label_user_id" style="width: 300px" />
         </el-form-item>
-        <el-form-item label="国家代码">
-          <HistoryInput v-model="labelForm.country_code" placeholder="默认886（台湾）" clearable storage-key="user-manage_country_code" style="width: 200px" />
-        </el-form-item>
         <el-form-item>
-          <el-button type="warning" :loading="labelLoading" @click="handleAddLabel">打海外标签</el-button>
+          <el-button :loading="queryLabelLoading" @click="handleQueryLabel">查询海外标签</el-button>
+          <el-button type="warning" :loading="labelLoading" @click="handleAddLabel" style="margin-left: 12px;">添加海外标签</el-button>
+          <el-button type="danger" :loading="deleteLabelLoading" @click="handleDeleteLabel" style="margin-left: 12px;">删除海外标签</el-button>
         </el-form-item>
       </el-form>
       <el-alert
@@ -56,6 +55,32 @@
         :title="labelResult.msg"
         :description="labelResult.raw"
         :type="labelResult.success ? 'success' : 'error'"
+        show-icon
+        :closable="false"
+        class="result-alert"
+      />
+    </el-card>
+
+    <!-- Cocos标签管理 -->
+    <el-card class="action-card">
+      <template #header>
+        <span><strong>Cocos标签管理</strong>（通过用户ID）</span>
+      </template>
+      <el-form :model="cocosLabelForm" label-width="100px" @submit.prevent>
+        <el-form-item label="用户ID">
+          <HistoryInput v-model="cocosLabelForm.user_id" placeholder="请输入用户ID" clearable storage-key="user-manage_cocos_label_user_id" style="width: 300px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button :loading="queryCocosLabelLoading" @click="handleQueryCocosLabel">查询Cocos标签</el-button>
+          <el-button type="warning" :loading="cocosLabelLoading" @click="handleAddCocosLabel" style="margin-left: 12px;">添加Cocos标签</el-button>
+          <el-button type="danger" :loading="deleteCocosLabelLoading" @click="handleDeleteCocosLabel" style="margin-left: 12px;">删除Cocos标签</el-button>
+        </el-form-item>
+      </el-form>
+      <el-alert
+        v-if="cocosLabelResult"
+        :title="cocosLabelResult.msg"
+        :description="cocosLabelResult.raw"
+        :type="cocosLabelResult.success ? 'success' : 'error'"
         show-icon
         :closable="false"
         class="result-alert"
@@ -97,7 +122,7 @@
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Phone } from '@element-plus/icons-vue'
-import { getMobile, addOverseasLabel, unlockAccount } from '@/api/user'
+import { getMobile, addOverseasLabel, queryOverseasLabel, deleteOverseasLabel, queryCocosLabel, addCocosLabel, deleteCocosLabel, unlockAccount } from '@/api/user'
 
 const copyMobile = (mobile) => {
   if (navigator.clipboard && window.isSecureContext) {
@@ -147,10 +172,53 @@ const handleGetMobile = async () => {
   }
 }
 
-// 打海外标签
+// 海外标签管理
 const labelForm = reactive({ user_id: '', country_code: '886' })
 const labelLoading = ref(false)
+const queryLabelLoading = ref(false)
+const deleteLabelLoading = ref(false)
 const labelResult = ref(null)
+
+// 将后端解析好的单个 type 结果格式化为可读文本
+// action: 'query' | 'add' | 'delete'
+const formatLabelItem = (item, labelType, action) => {
+  if (!item) return `${labelType}: 无响应`
+  if (action === 'add') {
+    // 第一个 code：10000=添加前已存在，60024=添加前不存在（本次已添加）
+    return `${labelType}: ${item.has_label ? '已存在' : '已添加'}`
+  }
+  if (action === 'delete') {
+    // 第一个 code：10000=删除前有标签（本次已删除），60024=删除前无标签
+    return `${labelType}: ${item.has_label ? '已删除' : '不存在'}`
+  }
+  return `${labelType}: ${item.has_label ? '存在' : '不存在'}`
+}
+
+const handleQueryLabel = async () => {
+  if (!labelForm.user_id.trim()) {
+    ElMessage.warning('请输入用户ID')
+    return
+  }
+  queryLabelLoading.value = true
+  labelResult.value = null
+  try {
+    const res = await queryOverseasLabel({ user_id: labelForm.user_id.trim() })
+    if (res.code === '0') {
+      const lines = [
+        formatLabelItem(res.data?.overseas, 'overseas'),
+        formatLabelItem(res.data?.global, 'global')
+      ]
+      const hasAny = res.data?.overseas?.has_label || res.data?.global?.has_label
+      labelResult.value = { success: true, msg: `查询结果：标签${hasAny ? '存在' : '不存在'}`, raw: lines.join('\n') }
+    } else {
+      labelResult.value = { success: false, msg: res.msg || '查询失败', raw: '' }
+    }
+  } catch (e) {
+    labelResult.value = { success: false, msg: '请求异常', raw: String(e) }
+  } finally {
+    queryLabelLoading.value = false
+  }
+}
 
 const handleAddLabel = async () => {
   if (!labelForm.user_id.trim()) {
@@ -160,16 +228,13 @@ const handleAddLabel = async () => {
   labelLoading.value = true
   labelResult.value = null
   try {
-    const res = await addOverseasLabel({ user_id: labelForm.user_id.trim(), country_code: labelForm.country_code || '886', env: 'test' })
+    const res = await addOverseasLabel({ user_id: labelForm.user_id.trim() })
     if (res.code === '0') {
-      let detail = res.data?.raw || ''
-      let success = true
-      try {
-        const parsed = JSON.parse(res.data?.raw)
-        detail = parsed.info || parsed.message || JSON.stringify(parsed)
-        success = parsed.status === 1 || parsed.status === 0
-      } catch (_) {}
-      labelResult.value = { success, msg: success ? '操作成功' : '操作失败', raw: detail }
+      const lines = [
+        formatLabelItem(res.data?.overseas, 'overseas', 'add'),
+        formatLabelItem(res.data?.global, 'global', 'add')
+      ]
+      labelResult.value = { success: true, msg: '添加成功', raw: lines.join('\n') }
     } else {
       labelResult.value = { success: false, msg: res.msg || '操作失败', raw: '' }
     }
@@ -177,6 +242,100 @@ const handleAddLabel = async () => {
     labelResult.value = { success: false, msg: '请求异常', raw: String(e) }
   } finally {
     labelLoading.value = false
+  }
+}
+
+const handleDeleteLabel = async () => {
+  if (!labelForm.user_id.trim()) {
+    ElMessage.warning('请输入用户ID')
+    return
+  }
+  deleteLabelLoading.value = true
+  labelResult.value = null
+  try {
+    const res = await deleteOverseasLabel({ user_id: labelForm.user_id.trim() })
+    if (res.code === '0') {
+      const lines = [
+        formatLabelItem(res.data?.overseas, 'overseas', 'delete'),
+        formatLabelItem(res.data?.global, 'global', 'delete')
+      ]
+      labelResult.value = { success: true, msg: '删除成功', raw: lines.join('\n') }
+    } else {
+      labelResult.value = { success: false, msg: res.msg || '操作失败', raw: '' }
+    }
+  } catch (e) {
+    labelResult.value = { success: false, msg: '请求异常', raw: String(e) }
+  } finally {
+    deleteLabelLoading.value = false
+  }
+}
+
+// Cocos标签管理
+const cocosLabelForm = reactive({ user_id: '' })
+const cocosLabelLoading = ref(false)
+const queryCocosLabelLoading = ref(false)
+const deleteCocosLabelLoading = ref(false)
+const cocosLabelResult = ref(null)
+
+const formatCocosLabelItem = (item, action) => {
+  if (!item) return 'cocos: 无响应'
+  if (action === 'add') return `cocos: ${item.has_label ? '已存在' : '已添加'}`
+  if (action === 'delete') return `cocos: ${item.has_label ? '已删除' : '不存在'}`
+  return `cocos: ${item.has_label ? '存在' : '不存在'}`
+}
+
+const handleQueryCocosLabel = async () => {
+  if (!cocosLabelForm.user_id.trim()) { ElMessage.warning('请输入用户ID'); return }
+  queryCocosLabelLoading.value = true
+  cocosLabelResult.value = null
+  try {
+    const res = await queryCocosLabel({ user_id: cocosLabelForm.user_id.trim() })
+    if (res.code === '0') {
+      const hasAny = res.data?.cocos?.has_label
+      cocosLabelResult.value = { success: true, msg: `查询结果：标签${hasAny ? '存在' : '不存在'}`, raw: formatCocosLabelItem(res.data?.cocos, 'query') }
+    } else {
+      cocosLabelResult.value = { success: false, msg: res.msg || '查询失败', raw: '' }
+    }
+  } catch (e) {
+    cocosLabelResult.value = { success: false, msg: '请求异常', raw: String(e) }
+  } finally {
+    queryCocosLabelLoading.value = false
+  }
+}
+
+const handleAddCocosLabel = async () => {
+  if (!cocosLabelForm.user_id.trim()) { ElMessage.warning('请输入用户ID'); return }
+  cocosLabelLoading.value = true
+  cocosLabelResult.value = null
+  try {
+    const res = await addCocosLabel({ user_id: cocosLabelForm.user_id.trim() })
+    if (res.code === '0') {
+      cocosLabelResult.value = { success: true, msg: '添加成功', raw: formatCocosLabelItem(res.data?.cocos, 'add') }
+    } else {
+      cocosLabelResult.value = { success: false, msg: res.msg || '操作失败', raw: '' }
+    }
+  } catch (e) {
+    cocosLabelResult.value = { success: false, msg: '请求异常', raw: String(e) }
+  } finally {
+    cocosLabelLoading.value = false
+  }
+}
+
+const handleDeleteCocosLabel = async () => {
+  if (!cocosLabelForm.user_id.trim()) { ElMessage.warning('请输入用户ID'); return }
+  deleteCocosLabelLoading.value = true
+  cocosLabelResult.value = null
+  try {
+    const res = await deleteCocosLabel({ user_id: cocosLabelForm.user_id.trim() })
+    if (res.code === '0') {
+      cocosLabelResult.value = { success: true, msg: '删除成功', raw: formatCocosLabelItem(res.data?.cocos, 'delete') }
+    } else {
+      cocosLabelResult.value = { success: false, msg: res.msg || '操作失败', raw: '' }
+    }
+  } catch (e) {
+    cocosLabelResult.value = { success: false, msg: '请求异常', raw: String(e) }
+  } finally {
+    deleteCocosLabelLoading.value = false
   }
 }
 

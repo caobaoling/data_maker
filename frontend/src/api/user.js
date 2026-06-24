@@ -107,6 +107,54 @@ export function addOverseasLabel(data) {
 }
 
 /**
+ * 查询用户海外标签
+ * @param {Object} data - 请求参数
+ * @param {string} data.user_id - 用户ID
+ */
+export function queryOverseasLabel(data) {
+  return request({
+    url: '/api/user/query_overseas_label',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除用户海外标签
+ * @param {Object} data - 请求参数
+ * @param {string} data.user_id - 用户ID
+ * @param {string} data.country_code - 国家代码
+ */
+export function deleteOverseasLabel(data) {
+  return request({
+    url: '/api/user/delete_overseas_label',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 查询用户Cocos标签
+ */
+export function queryCocosLabel(data) {
+  return request({ url: '/api/user/query_cocos_label', method: 'post', data })
+}
+
+/**
+ * 添加用户Cocos标签
+ */
+export function addCocosLabel(data) {
+  return request({ url: '/api/user/add_cocos_label', method: 'post', data })
+}
+
+/**
+ * 删除用户Cocos标签
+ */
+export function deleteCocosLabel(data) {
+  return request({ url: '/api/user/delete_cocos_label', method: 'post', data })
+}
+
+/**
  * 通过手机号解锁账户
  * @param {Object} data - 请求参数
  * @param {string} data.username - 手机号

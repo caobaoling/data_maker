@@ -140,7 +140,7 @@ const wealthTypes = ref([])
 // 表单数据
 const form = reactive({
   user_id: '',
-  sku_type: '',
+  sku_type: 'point',
   count: 100,
   days: 300
 })
