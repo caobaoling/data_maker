@@ -22,6 +22,7 @@ from api.user import user_bp
 from api.tools import tools_bp
 from api.order import order_bp
 from api.risk import risk_bp
+from api.cocos import cocos_bp
 
 # 创建Flask应用
 app = Flask(__name__)
@@ -46,6 +47,7 @@ app.register_blueprint(user_bp, url_prefix='/api/user')
 app.register_blueprint(tools_bp, url_prefix='/api/tools')
 app.register_blueprint(order_bp, url_prefix='/api/order')
 app.register_blueprint(risk_bp, url_prefix='/api/risk')
+app.register_blueprint(cocos_bp, url_prefix='/api/cocos')
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])

@@ -153,6 +153,16 @@
             </el-menu-item>
           </el-sub-menu>
 
+          <el-sub-menu index="cocos">
+            <template #title>
+              <el-icon><DataAnalysis /></el-icon>
+              <span>cocos</span>
+            </template>
+            <el-menu-item index="/cocos/verify-mastery" @click="handleMenuClick('/cocos/verify-mastery', '线上环境课后出题')">
+              线上环境课后出题
+            </el-menu-item>
+          </el-sub-menu>
+
           <el-sub-menu index="tools">
             <template #title>
               <el-icon><Tools /></el-icon>
@@ -227,7 +237,7 @@ import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTabsStore } from '@/stores/tabs'
 import { ElMessageBox } from 'element-plus'
-import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight, UserFilled, Tools } from '@element-plus/icons-vue'
+import { Expand, ArrowDown, Calendar, Grid, User, Coin, Close, Reading, ArrowLeft, ArrowRight, UserFilled, Tools, DataAnalysis } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()

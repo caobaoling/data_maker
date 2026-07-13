@@ -176,6 +176,12 @@ const routes = [
         name: 'UrlUnquote',
         component: () => import('@/views/tools/UrlUnquote.vue'),
         meta: { title: '转义URL', icon: 'Link' }
+      },
+      {
+        path: '/cocos/verify-mastery',
+        name: 'CocosVerifyMastery',
+        component: () => import('@/views/cocos/VerifyMastery.vue'),
+        meta: { title: '线上环境课后出题', icon: 'DataAnalysis' }
       }
     ]
   }
