@@ -52,7 +52,7 @@ def load_knowledge_ids(appoint_ids: list) -> list:
     )
     placeholders = ', '.join(['%s'] * len(appoint_ids))
     sql = f"""
-        SELECT knowledge_id
+        SELECT id
         FROM `midplatform_user_learning`.`user_appoint_knowledge_mastery`
         WHERE `appoint_id` IN ({placeholders})
         ORDER BY `create_time`
@@ -105,10 +105,20 @@ def update_mastery(knowledge_ids: list, mastery: str):
         print(f"  失败的 knowledge_id: {failed}")
 
 
+def run(appoint_ids, mastery):
+    kids = load_knowledge_ids(appoint_ids)
+    if not kids:
+        print("未查到 knowledge_id")
+        return
+
+    update_mastery(kids, mastery)
 # ─────────────────────────────────────────────────────────
 # 入口
 # ─────────────────────────────────────────────────────────
 if __name__ == '__main__':
+    # 用法: python reset_mastery.py [mastery]
+    #       python reset_mastery.py not_mastered
+    appoint_ids = APPOINT_IDS
     mastery = sys.argv[1] if len(sys.argv) > 1 else 'not_mastered'
 
     if mastery not in VALID_MASTERY_VALUES:
@@ -116,11 +126,11 @@ if __name__ == '__main__':
         print(f"  可选值: {', '.join(sorted(VALID_MASTERY_VALUES))}")
         sys.exit(1)
 
-    print(f"appoint_ids: {APPOINT_IDS}")
+    print(f"appoint_ids: {appoint_ids}")
     print(f"目标 mastery: {mastery}")
 
     print(f"\n[1] 查询数据库 knowledge_id ...")
-    kids = load_knowledge_ids(APPOINT_IDS)
+    kids = load_knowledge_ids(appoint_ids)
     print(f"    共 {len(kids)} 条")
     for kid in kids:
         print(f"    knowledge_id={kid}")

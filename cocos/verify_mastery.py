@@ -265,13 +265,13 @@ def load_api_questions(json_file: str = 'json.json') -> list:
     """
     解析 json.json，提取每道题：
     {template_code, question_type(编码), knowledge_type(英文), ability_type(英文), knowledge_ids}
-    忽略 SUMMARY_V1 / SUMMARY_PERSON / PRE_POST_SETTLE 等非题目模板。
+    忽略 SUMMARY_V1非完美总结页/ SUMMARY_V2非完美总结页/ SUMMARY_PERSON个性化总结页/ PRE_POST_SETTLE结算页/SUMMARY_PERFECT完美总结页 等非题目模板。
     """
     json_path = os.path.join(os.path.dirname(__file__), json_file)
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    skip_templates = {'SUMMARY_V1', 'SUMMARY_PERSON', 'PRE_POST_SETTLE'}
+    skip_templates = {'SUMMARY_V1','SUMMARY_V2', 'SUMMARY_PERSON', 'PRE_POST_SETTLE','SUMMARY_PERFECT'}
     questions = []
 
     for item in data.get('res', []):
@@ -339,7 +339,7 @@ def load_lesson_scope(lesson_type_en: str, level: str) -> set:
         if i == 0:
             continue
         kt_en_raw, lv_raw, pt_en, ab_code = row[1], row[2], row[3], row[4]
-        if kt_en_raw != lesson_type_en or lv_raw != level:
+        if str(kt_en_raw).strip().lower() != lesson_type_en.strip().lower() or str(lv_raw).strip().lower() != level.strip().lower():
             continue
         if pt_en and ab_code:
             ab_normalized = str(ab_code).strip().replace('_', '-')
@@ -959,7 +959,7 @@ if __name__ == '__main__':
 
     print(f"\n[4] 自动拉取接口数据 ...")
     import cocos.fetch_api as _fetch_api
-    _fetch_api.fetch(appoint_id)
+    _fetch_api.fetch(appoint_id, appoint_id, '')
 
     print(f"\n[5] 读取接口返回数据 (json.json) ...")
     api_questions = load_api_questions('json.json')

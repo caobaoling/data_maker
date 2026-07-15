@@ -8,8 +8,16 @@ import pymysql
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from common.db_utils import load_config
 
+COURSE_TYPES = {
+    "100": "阅读",
+    "101": "词汇",
+    "102": "字母",
+    "103": "自拼",
+    "104": "嘉年华",
+    "105": "对话",
+}
 
-def fetch(appoint_id: str):
+def fetch(appoint_id: str, course_id: str, suffix: str):
     # 从数据库查询 id
     cfg = load_config()
     conn = pymysql.connect(
@@ -46,18 +54,46 @@ def fetch(appoint_id: str):
     print(f"完整请求URL：{response.url}")
 
     result = response.json()
+
+    # 保持原来的 json.json
     out_path = os.path.join(os.path.dirname(__file__), "json.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"状态码: {response.status_code}")
-    print(f"结果已保存到 {out_path}")
+    save_dir = os.path.join(
+        os.path.dirname(__file__),
+        "6种课型的接口返回json"
+    )
+    os.makedirs(save_dir, exist_ok=True)
+
+    course_name = COURSE_TYPES[course_id]
+
+    filename = f"{course_id}{course_name}{suffix}.json"
+
+    lesson_path = os.path.join(save_dir, filename)
+
+    with open(lesson_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+
+    print(f"已保存：{lesson_path}")
     return True
 
+def run(appoint_ids, suffix):
+    for appoint_id in appoint_ids:
+        print(f"\n========== {appoint_id}{COURSE_TYPES[appoint_id]} ==========")
+        fetch(appoint_id, appoint_id, suffix)
 
-if __name__ == '__main__':
-    appoint_id = sys.argv[1] if len(sys.argv) > 1 else None
-    if not appoint_id:
-        print("用法: python cocos/fetch_api.py <appoint_id>")
+if __name__ == "__main__":
+    
+    suffix = sys.argv[1] if len(sys.argv) > 1 else None
+
+    if not suffix:
+        print("用法：python fetch_api.py moderate_mastery")
         sys.exit(1)
-    fetch(appoint_id)
+
+    for course_id in COURSE_TYPES:
+        print(f"\n========== 开始获取 {course_id}{COURSE_TYPES[course_id]} ==========")
+
+        fetch(appoint_id, course_id, suffix)
+        
+    run(list(COURSE_TYPES.keys()), suffix)
