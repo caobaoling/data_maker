@@ -1,0 +1,544 @@
+{
+  "code": "10000",
+  "message": "success",
+  "timestamp": "1784368134296",
+  "res": [
+    {
+      "template_id": -1597898550,
+      "template_code": "SUMMARY_V2",
+      "ability_type": null,
+      "knowledge_type": null,
+      "mastery_level": null,
+      "ability_knowledge_order": null,
+      "data": {
+        "resources": {},
+        "questions": [],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": {
+          "video": "https://content-mid.51talkjr.com/content-resource/resource/video_package/video/2039178179248434/2026/07/10/2075498664427891.mp4",
+          "words": null,
+          "sentence_patterns": [
+            {
+              "knowledge_id": "2065053106835924",
+              "knowledge_type": "sentence_pattern_structure",
+              "knowledge_name": "It's ... and ...",
+              "image": null,
+              "ability_level": {
+                "INPUT-LISTEN": 1,
+                "OUTPUT-SPEAK": 1
+              }
+            },
+            {
+              "knowledge_id": "2065053106835963",
+              "knowledge_type": "sentence_pattern_structure",
+              "knowledge_name": "There are ...s in ...",
+              "image": null,
+              "ability_level": {
+                "INPUT-LISTEN": 1,
+                "OUTPUT-SPEAK": 1
+              }
+            }
+          ],
+          "sentence_pattern": null,
+          "functional_language": null,
+          "topic": null,
+          "reading": [
+            {
+              "knowledge_id": "2070028239241568",
+              "knowledge_type": "reading",
+              "knowledge_name": "Little fish's four seasons",
+              "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/25/14/2-1-7/reading/image/global-L2U1L7-reading-P0.jpg",
+              "ability_level": {
+                "INPUT-READ": 1
+              }
+            }
+          ],
+          "letters": null,
+          "letter_words": null,
+          "letters_words": null,
+          "chant": null,
+          "phonics": null,
+          "phonics_words": null
+        },
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893534287,
+      "template_code": "SUMMARY_PERSON",
+      "ability_type": null,
+      "knowledge_type": null,
+      "mastery_level": null,
+      "ability_knowledge_order": null,
+      "data": {
+        "resources": {},
+        "questions": [],
+        "template_theme_url": null,
+        "transition": "tokiTrans",
+        "knowledges": null,
+        "content": {
+          "title": "My Learning Highlights",
+          "good_performance_title": "I can do it!",
+          "need_strengthen_title": "I need to do it!",
+          "watermark": null,
+          "video": null,
+          "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260718/1784368131418_36c71ecb6ec648f2a288e7d33ac21720.mp3",
+          "words": null,
+          "sentence_patterns": null,
+          "good_performance": [],
+          "need_strengthen": [
+            "再挑战一下句型 \"It's ... and ...\"",
+            "再来读一下绘本 \"Little fish's four seasons\""
+          ],
+          "good_default": [
+            "继续加油，一起看看下面需要加强的内容"
+          ],
+          "need_default": [
+            "基础难度全部通过，让我们一起挑战高难度吧！"
+          ]
+        },
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526095,
+      "template_code": "PIC_TEXT_LISTEN_REPEAT",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "sentence_pattern_structure",
+      "mastery_level": 2,
+      "ability_knowledge_order": 13,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070449886474389",
+            "question_type": "TR_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "sentence_pattern_structure",
+                "point_id": "2065053106835924"
+              },
+              {
+                "point_type_name_en": "sentence_pattern_example_sentence",
+                "point_id": "2065053106835930"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "sentence_pattern_structure",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260706/1783332532582_333c94142d184fdab1c455c954725149.mp3",
+              "image": "https://content-mid.51talkjr.com/talk-content-resource/transfer/20260612/1781234601685_0d7ba7b6fe05458694454c15edd56573.png",
+              "text": "It's snowy and cold.",
+              "role_name": "Lin"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526095,
+      "template_code": "PIC_TEXT_LISTEN_REPEAT",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "sentence_pattern_structure",
+      "mastery_level": 2,
+      "ability_knowledge_order": 13,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070450012303535",
+            "question_type": "TR_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "sentence_pattern_structure",
+                "point_id": "2065053106835963"
+              },
+              {
+                "point_type_name_en": "sentence_pattern_example_sentence",
+                "point_id": "2065053106835840"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "sentence_pattern_structure",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260706/1783332492016_e96b74272dfe41d290597bbb595eff79.mp3",
+              "image": "https://content-mid.51talkjr.com/talk-content-resource/transfer/20260612/1781240754673_312e3a6c1c6540e7823a78e931e27ad7.png",
+              "text": "There are snowstorms in winter.",
+              "role_name": "Lin"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526088,
+      "template_code": "PIC_TEXT_SPEAK",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "sentence_pattern_structure",
+      "mastery_level": 3,
+      "ability_knowledge_order": 13,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070449886474387",
+            "question_type": "TSP_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "sentence_pattern_structure",
+                "point_id": "2065053106835924"
+              },
+              {
+                "point_type_name_en": "sentence_pattern_example_sentence",
+                "point_id": "2065053106835930"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "sentence_pattern_structure",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              },
+              {
+                "category_code": "question_method",
+                "code": "non-intercourse",
+                "subject_grade_code": null
+              }
+            ],
+            "title": {
+              "image": "https://content-mid.51talkjr.com/talk-content-resource/transfer/20260612/1781234601685_0d7ba7b6fe05458694454c15edd56573.png",
+              "text": "It's snowy and cold.",
+              "text_list": [
+                "It's snowy and cold."
+              ],
+              "answer": "It's snowy and cold.",
+              "role_name": "Lin"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526088,
+      "template_code": "PIC_TEXT_SPEAK",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "sentence_pattern_structure",
+      "mastery_level": 3,
+      "ability_knowledge_order": 13,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070450012299473",
+            "question_type": "TSP_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "sentence_pattern_structure",
+                "point_id": "2065053106835963"
+              },
+              {
+                "point_type_name_en": "sentence_pattern_example_sentence",
+                "point_id": "2065053106835964"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "sentence_pattern_structure",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              },
+              {
+                "category_code": "question_method",
+                "code": "non-intercourse",
+                "subject_grade_code": null
+              }
+            ],
+            "title": {
+              "image": "https://content-mid.51talkjr.com/talk-content-resource/transfer/20260612/1781240666134_7bae5d35b5c846d196e24b374fbfcf15.png",
+              "text": "There are rainstorms in summer.",
+              "text_list": [
+                "There are rainstorms in summer."
+              ],
+              "answer": "There are rainstorms in summer.",
+              "role_name": "Leo"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": -1597890365,
+      "template_code": "READING_LISTEN_TEXT_CHOOSE_TEXT",
+      "ability_type": "INPUT-READ",
+      "knowledge_type": "reading",
+      "mastery_level": 2,
+      "ability_knowledge_order": 15,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2071510472720876",
+            "question_type": "TS_1026",
+            "language": "en",
+            "point_list": [
+              {
+                "point_type_name_en": "reading",
+                "point_id": "2070028239241568"
+              },
+              {
+                "point_type_name_en": "reading_content",
+                "point_id": "2070028239241573"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "question_method",
+                "code": "detail",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "ability",
+                "code": "INPUT-READ",
+                "subject_grade_code": "teenager_en"
+              },
+              {
+                "category_code": "course_type_master",
+                "code": "reading_class",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "sense_type",
+                "code": "reading",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": ""
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260629/1782714639523_6736b89a417f4ba7a75851be42b3d059.mp3",
+              "text": "What kind of storms are there in summer?"
+            },
+            "options": [
+              {
+                "text": "snowstorms",
+                "is_right": false
+              },
+              {
+                "text": "thunderstorms",
+                "is_right": true
+              }
+            ]
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": -1597890342,
+      "template_code": "READING_LISTEN_TEXT_CHOOSE_PIC",
+      "ability_type": "INPUT-READ",
+      "knowledge_type": "reading",
+      "mastery_level": 3,
+      "ability_knowledge_order": 15,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2071510472720874",
+            "question_type": "TS_1004",
+            "language": "en",
+            "point_list": [
+              {
+                "point_type_name_en": "reading",
+                "point_id": "2070028239241568"
+              },
+              {
+                "point_type_name_en": "reading_content",
+                "point_id": "2070028239241571"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "question_method",
+                "code": "detail",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "ability",
+                "code": "INPUT-READ",
+                "subject_grade_code": "teenager_en"
+              },
+              {
+                "category_code": "course_type_master",
+                "code": "reading_class",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "sense_type",
+                "code": "reading",
+                "subject_grade_code": ""
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": ""
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260629/1782714916211_3e33acae87ea41258178b3eb969b88a4.mp3",
+              "text": "Where does the fish live?",
+              "knowledge_content": [
+                {
+                  "knowledge_id": "2070028239241571",
+                  "knowledge_type": "reading_content",
+                  "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260625/1782373060968_f7fc884fea7047039111d02db354231e.mp3",
+                  "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/25/14/2-1-7/reading/image/global-L2U1L7-reading-P1.jpg",
+                  "text": "Hello! I'm a little fish. I live in a clear river. I see all four seasons!"
+                }
+              ]
+            },
+            "options": [
+              {
+                "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/29/16/resource/image/d01db86d6e6c4a56a7dc3790db0e12a5.jpg",
+                "text": "in a river",
+                "is_right": true
+              },
+              {
+                "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/29/16/resource/image/172c84ccfcea4b28989eaf578adf6fdd.jpg",
+                "text": "in the sea",
+                "is_right": false
+              },
+              {
+                "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/29/16/resource/image/9dea685b256d4da3a6409f0dc81c48f1.jpg",
+                "text": "in a fish tank",
+                "is_right": false
+              }
+            ]
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893534236,
+      "template_code": "PRE_POST_SETTLE",
+      "ability_type": null,
+      "knowledge_type": null,
+      "mastery_level": null,
+      "ability_knowledge_order": null,
+      "data": null
+    }
+  ],
+  "is_success_p": true
+}

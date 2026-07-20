@@ -13,7 +13,7 @@ COURSE_TYPES = {
     "102": "字母",
     "103": "自拼",
     "104": "嘉年华",
-    "105": "对话",
+    "105": "对话",    
 }
 
 # 支持的掌握程度
@@ -29,11 +29,11 @@ def main():
     """
     用法：
 
-    python run_all.py all moderate_mastery
+    python run_post_class_summary.py all moderate_mastery
 
-    python run_all.py 101 moderate_mastery
+    python run_post_class_summary.py 101 moderate_mastery
 
-    python run_all.py 100,101,103 perfect_mastery
+    python run_post_class_summary.py 100,101,103 perfect_mastery
     """
 
     if len(sys.argv) != 3:
@@ -42,15 +42,15 @@ def main():
 
 全部课型：
 
-python run_all.py all moderate_mastery
+python run_post_class_summary.py all moderate_mastery
 
 单个课型：
 
-python run_all.py 101 moderate_mastery
+python run_post_class_summary.py 101 moderate_mastery
 
 多个课型：
 
-python run_all.py 100,101,103 moderate_mastery
+python run_post_class_summary.py 100,101,103 moderate_mastery
 
 mastery可选：
 

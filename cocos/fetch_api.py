@@ -38,16 +38,21 @@ def fetch(appoint_id: str, course_id: str, suffix: str):
         return False
 
     material_id = str(row[0])
-    print(f"[fetch_api] appoint_id={appoint_id} → id={material_id}")
+    course_name = COURSE_TYPES.get(appoint_id, '')
+    print(f"[fetch_api] appoint_id={appoint_id}({course_name}) → id={material_id}")
 
     #测试环境
-    #url = "http://172.16.70.131:10014/midplatform_user_learning_schedule/api/datasource/post_class_remmment"
-    #线上环境
-    url = "http://10.0.18.156:8080/midplatform_user_learning_schedule/api/datasource/post_class_remmment"
+    url = "http://172.16.70.131:10014/midplatform_user_learning_schedule/api/datasource/post_class_remmment"
+    #线上环境-境内
+    #url = "http://10.0.18.156:8080/midplatform_user_learning_schedule/api/datasource/post_class_remmment"
+    #线上环境-境外
+    #url = "http://192.168.65.156:8080/midplatform_user_learning_schedule/api/datasource/post_class_remmment"
     params = {
         "id": material_id,
         "appkey": "java",
-        "timestamp": str(int(time.time() * 1000))
+        "timestamp": str(int(time.time() * 1000)),
+        "language": "en",
+        "user_name": "Tom"
     }
 
     response = requests.get(url, params=params, timeout=30)

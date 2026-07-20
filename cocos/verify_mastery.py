@@ -958,7 +958,10 @@ if __name__ == '__main__':
               f" | ability={row['ability_type']} | mastery={row['mastery']}")
 
     print(f"\n[4] 自动拉取接口数据 ...")
-    import cocos.fetch_api as _fetch_api
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location("fetch_api", os.path.join(os.path.dirname(__file__), "fetch_api.py"))
+    _fetch_api = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_fetch_api)
     _fetch_api.fetch(appoint_id, appoint_id, '')
 
     print(f"\n[5] 读取接口返回数据 (json.json) ...")

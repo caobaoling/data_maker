@@ -25,7 +25,7 @@ from common.db_utils import load_config
 # 配置
 # ─────────────────────────────────────────────────────────
 APPOINT_IDS = ['100', '101', '102', '103', '104', '105']
-#APPOINT_IDS = ['100']
+#APPOINT_IDS = ['541992584']
 
 VALID_MASTERY_VALUES = {
     'not_mastered',
@@ -105,13 +105,39 @@ def update_mastery(knowledge_ids: list, mastery: str):
         print(f"  失败的 knowledge_id: {failed}")
 
 
+def sync_db_mastery(appoint_ids: list, mastery: str):
+    """直接更新测试环境数据库中对应 appoint_id 的 mastery 字段"""
+    cfg = load_config()
+    conn = pymysql.connect(
+        host=cfg['host'],
+        port=cfg['port'],
+        user=cfg['user'],
+        password=cfg['password'],
+        database='midplatform_user_learning',
+        charset='utf8mb4',
+    )
+    placeholders = ', '.join(['%s'] * len(appoint_ids))
+    sql = f"""
+        UPDATE `midplatform_user_learning`.`user_appoint_knowledge_mastery`
+        SET `mastery` = %s
+        WHERE `appoint_id` IN ({placeholders})
+    """
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, [mastery] + appoint_ids)
+            affected = cur.rowcount
+        conn.commit()
+    print(f"  [DB同步] 已更新 {affected} 条记录 mastery={mastery}，appoint_ids={appoint_ids}")
+
+
 def run(appoint_ids, mastery):
     kids = load_knowledge_ids(appoint_ids)
     if not kids:
         print("未查到 knowledge_id")
         return
 
-    update_mastery(kids, mastery)
+    #update_mastery(kids, mastery)
+    sync_db_mastery(appoint_ids, mastery)
 # ─────────────────────────────────────────────────────────
 # 入口
 # ─────────────────────────────────────────────────────────
@@ -140,4 +166,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     print(f"\n[2] 批量调用接口更新 mastery={mastery} ...")
-    update_mastery(kids, mastery)
+    #update_mastery(kids, mastery)
+
+    print(f"\n[3] 同步更新测试环境数据库 mastery={mastery} ...")
+    sync_db_mastery(appoint_ids, mastery)
