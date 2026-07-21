@@ -51,7 +51,7 @@ def fetch(appoint_id: str, course_id: str, suffix: str):
         "id": material_id,
         "appkey": "java",
         "timestamp": str(int(time.time() * 1000)),
-        "language": "en",
+        "language": "ja",
         "user_name": "Tom"
     }
 

@@ -1,7 +1,7 @@
 {
   "code": "10000",
   "message": "success",
-  "timestamp": "1784605665611",
+  "timestamp": "1784537328906",
   "res": [
     {
       "template_id": -1597898550,
@@ -16,7 +16,7 @@
         "template_theme_url": null,
         "transition": null,
         "knowledges": {
-          "video": "https://content-mid.51talkjr.com/content-resource/resource/video_package/video/2039178179248434/2026/07/10/2075453680517580.mp4",
+          "video": "https://content-mid.51talkjr.com/content-resource/resource/video_package/video/2039178179248434/2026/07/07/2074429741859333.mp4",
           "words": [
             {
               "knowledge_id": "2064750429082106",
@@ -60,7 +60,7 @@
               "knowledge_name": "grandma",
               "image": "https://content-mid.51talkjr.com/experience-center/1781251888410_dyzdi7wi.jpeg",
               "ability_level": {
-                "OUTPUT-SPEAK": 3
+                "OUTPUT-SPEAK": 1
               }
             },
             {
@@ -89,7 +89,7 @@
               "knowledge_name": "This is my ...",
               "image": null,
               "ability_level": {
-                "OUTPUT-SPEAK": 3
+                "OUTPUT-SPEAK": 1
               }
             }
           ],
@@ -101,7 +101,7 @@
               "knowledge_name": "Who is this?",
               "image": null,
               "ability_level": {
-                "INTERACTION-SPEAK": 3
+                "INTERACTION-SPEAK": 1
               }
             }
           ],
@@ -146,25 +146,144 @@
           "watermark": null,
           "video": null,
           "video_group": {
-            "breathing": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828258_Lucybreathing.mp4",
-            "circular": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828347_Lucycircular.mp4"
+            "breathing": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828218_Annabreathing.mp4",
+            "circular": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828386_Annacircular.mp4"
           },
-          "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260721/1784605663107_03d2e88c93b641adaa6856221154eaaf.mp3",
+          "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260720/1784537325907_2ec69e5d685e41ce9ad8e29ace664ae1.mp3",
           "words": null,
           "sentence_patterns": null,
           "good_performance": [
-            "能说出 grandpa",
-            "能说出 This is my ...",
-            "能在所学情境使用功能句 Who is this?"
+            "Can say the word grandpa"
           ],
-          "need_strengthen": [],
+          "need_strengthen": [
+            "Let's practice the word grandma",
+            "Try the sentence again: This is my ...",
+            "Try the functional sentence again: Who is this?"
+          ],
           "good_default": [
-            "继续加油，一起看看下面需要加强的内容"
+            "Keep it up! Let's see what we can work on next."
           ],
           "need_default": [
-            "基础难度全部通过，让我们一起挑战高难度吧！"
+            "Basics cleared! Ready to level up?"
           ]
         },
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526095,
+      "template_code": "PIC_TEXT_LISTEN_REPEAT",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "word_sense",
+      "mastery_level": 2,
+      "ability_knowledge_order": 12,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070448774983771",
+            "question_type": "TR_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "word_sense",
+                "point_id": "2064750517162199"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "word_sense",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260616/1781582847471_fb2918788ddc48948b72ec1a9921721b.mp3",
+              "image": "https://content-mid.51talkjr.com/experience-center/1781251900747_ysepmcjx.jpeg",
+              "text": "grandma"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526088,
+      "template_code": "PIC_TEXT_SPEAK",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "word_sense",
+      "mastery_level": 3,
+      "ability_knowledge_order": 12,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070448774983775",
+            "question_type": "TSP_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "word_sense",
+                "point_id": "2064750517162199"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "word_sense",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              }
+            ],
+            "title": {
+              "image": "https://content-mid.51talkjr.com/experience-center/1781251888410_dyzdi7wi.jpeg",
+              "text": "grandma",
+              "text_list": [
+                "grandma"
+              ],
+              "answer": "grandma"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
         "translate_ext": null
       }
     },
@@ -419,66 +538,6 @@
         "resources": null,
         "questions": [
           {
-            "question_id": "2070448774983775",
-            "question_type": "TSP_1003",
-            "language": "",
-            "point_list": [
-              {
-                "point_type_name_en": "word_sense",
-                "point_id": "2064750517162199"
-              }
-            ],
-            "tag_list": [
-              {
-                "category_code": "course_type_master",
-                "code": "vocabulary_class",
-                "subject_grade_code": null
-              },
-              {
-                "category_code": "sense_type",
-                "code": "word_sense",
-                "subject_grade_code": null
-              },
-              {
-                "category_code": "teach_content_type",
-                "code": "master",
-                "subject_grade_code": null
-              },
-              {
-                "category_code": "ability",
-                "code": "OUTPUT-SPEAK",
-                "subject_grade_code": "teenager_en"
-              }
-            ],
-            "title": {
-              "image": "https://content-mid.51talkjr.com/experience-center/1781251888410_dyzdi7wi.jpeg",
-              "text": "grandma",
-              "text_list": [
-                "grandma"
-              ],
-              "answer": "grandma"
-            },
-            "options": []
-          }
-        ],
-        "template_theme_url": null,
-        "transition": null,
-        "knowledges": null,
-        "content": null,
-        "translate_ext": null
-      }
-    },
-    {
-      "template_id": 893526088,
-      "template_code": "PIC_TEXT_SPEAK",
-      "ability_type": "OUTPUT-SPEAK",
-      "knowledge_type": "word_sense",
-      "mastery_level": 3,
-      "ability_knowledge_order": 12,
-      "data": {
-        "resources": null,
-        "questions": [
-          {
             "question_id": "2070448774983764",
             "question_type": "TSP_1003",
             "language": "",
@@ -589,6 +648,68 @@
       }
     },
     {
+      "template_id": 893526095,
+      "template_code": "PIC_TEXT_LISTEN_REPEAT",
+      "ability_type": "OUTPUT-SPEAK",
+      "knowledge_type": "sentence_pattern_structure",
+      "mastery_level": 2,
+      "ability_knowledge_order": 13,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2070448774983854",
+            "question_type": "TR_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "sentence_pattern_structure",
+                "point_id": "2065053106836033"
+              },
+              {
+                "point_type_name_en": "sentence_pattern_example_sentence",
+                "point_id": "2065053106836038"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "vocabulary_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "sentence_pattern_structure",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "OUTPUT-SPEAK",
+                "subject_grade_code": "teenager_en"
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260706/1783332461539_ed18b9ec075c422f8f2547a52c0758c4.mp3",
+              "image": "https://content-mid.51talkjr.com/experience-center/1781577208913_kqlvubck.jpeg",
+              "text": "This is my family.",
+              "role_name": "Leo"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
       "template_id": 893526088,
       "template_code": "PIC_TEXT_SPEAK",
       "ability_type": "OUTPUT-SPEAK",
@@ -647,6 +768,83 @@
               ],
               "answer": "This is my mom.",
               "role_name": "Leo"
+            },
+            "options": []
+          }
+        ],
+        "template_theme_url": null,
+        "transition": null,
+        "knowledges": null,
+        "content": null,
+        "translate_ext": null
+      }
+    },
+    {
+      "template_id": 893526095,
+      "template_code": "PIC_TEXT_LISTEN_REPEAT",
+      "ability_type": "INTERACTION-SPEAK",
+      "knowledge_type": "functional_language",
+      "mastery_level": 2,
+      "ability_knowledge_order": 16,
+      "data": {
+        "resources": null,
+        "questions": [
+          {
+            "question_id": "2071127115575468",
+            "question_type": "TR_1003",
+            "language": "",
+            "point_list": [
+              {
+                "point_type_name_en": "conversation",
+                "point_id": "2070028239241802"
+              },
+              {
+                "point_type_name_en": "conversation_sentence",
+                "point_id": "2070028239241807"
+              },
+              {
+                "point_type_name_en": "functional_language",
+                "point_id": "2070028239241801"
+              }
+            ],
+            "tag_list": [
+              {
+                "category_code": "course_type_master",
+                "code": "conversation_class",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "sense_type",
+                "code": "conversation",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "teach_content_type",
+                "code": "master",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "ability",
+                "code": "INTERACTION-SPEAK",
+                "subject_grade_code": "teenager_en"
+              },
+              {
+                "category_code": "question_method",
+                "code": "dialogue_no_with",
+                "subject_grade_code": null
+              },
+              {
+                "category_code": "question_method",
+                "code": "dialogue_specify",
+                "subject_grade_code": null
+              }
+            ],
+            "title": {
+              "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260625/1782373046036_c88bb1520de247dabd62d1574706cbef.mp3",
+              "image": "https://content-mid.51talkjr.com/talk-content/conversation-reading-import/2026/06/25/14/0-1-3/conversation/image/global-L0U1L3-dialogue1-P2.jpg",
+              "text": "Who is this?",
+              "round_id": "2070028239241807",
+              "role_name": "Maya"
             },
             "options": []
           }

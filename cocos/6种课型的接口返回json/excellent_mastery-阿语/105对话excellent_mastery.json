@@ -1,7 +1,7 @@
 {
   "code": "10000",
   "message": "success",
-  "timestamp": "1784605665611",
+  "timestamp": "1784539091608",
   "res": [
     {
       "template_id": -1597898550,
@@ -16,7 +16,7 @@
         "template_theme_url": null,
         "transition": null,
         "knowledges": {
-          "video": "https://content-mid.51talkjr.com/content-resource/resource/video_package/video/2039178179248434/2026/07/10/2075453680517580.mp4",
+          "video": "https://content-mid.51talkjr.com/content-resource/resource/video_package/video/2039178179248434/2026/07/03/2072971562713158.mp4",
           "words": [
             {
               "knowledge_id": "2064750429082106",
@@ -146,23 +146,23 @@
           "watermark": null,
           "video": null,
           "video_group": {
-            "breathing": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828258_Lucybreathing.mp4",
-            "circular": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828347_Lucycircular.mp4"
+            "breathing": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828054_Linabreathing.mp4",
+            "circular": "https://content-mid.51talkjr.com/talk-content/2026/0718/1784360828288_Linacircular.mp4"
           },
-          "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260721/1784605663107_03d2e88c93b641adaa6856221154eaaf.mp3",
+          "audio": "https://content-mid.51talkjr.com/talk-content/transfer/20260720/1784539088807_e6cb96e9cbcb4a39975776cdaaf6f5e4.mp3",
           "words": null,
           "sentence_patterns": null,
           "good_performance": [
-            "能说出 grandpa",
-            "能说出 This is my ...",
-            "能在所学情境使用功能句 Who is this?"
+            "dad قادر على نطقها الكلمات:",
+            "This is my ... قادر على نطقها الجمل:",
+            "Who is this? يستطيع استخدام الجملة في المواقف التي تعلّمها:"
           ],
           "need_strengthen": [],
           "good_default": [
-            "继续加油，一起看看下面需要加强的内容"
+            "استمر على هذا الأداء! لنرى ما يمكننا فعله بعد ذلك."
           ],
           "need_default": [
-            "基础难度全部通过，让我们一起挑战高难度吧！"
+            "تم إتقان الأساسيات! هل أنت مستعد للمستوى التالي؟"
           ]
         },
         "translate_ext": null

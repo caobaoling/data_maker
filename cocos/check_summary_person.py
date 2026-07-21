@@ -66,8 +66,14 @@ from openpyxl.styles import PatternFill, Font, Alignment
 
 EXPECTED_GOOD_TITLE = "I can do it!"
 EXPECTED_NEED_TITLE = "I need to do it!"
-EXPECTED_GOOD_DEFAULT = "继续加油，一起看看下面需要加强的内容"
-EXPECTED_NEED_DEFAULT = "基础难度全部通过，让我们一起挑战高难度吧！"
+EXPECTED_GOOD_DEFAULT = [
+    "继续加油，一起看看下面需要加强的内容",
+    "Keep it up! Let's see what we can work on next.",
+]
+EXPECTED_NEED_DEFAULT = [
+    "基础难度全部通过，让我们一起挑战高难度吧！",
+    "Basics cleared! Ready to level up?",
+]
 
 # ==========================================
 # 各课型文案前缀规则
@@ -122,62 +128,62 @@ ABILITY_TYPE_MAP = {
 # 前缀中 {word}/{sentence}/{letter}/{phonics}/{title} 为占位符，校验时做前缀匹配
 NEED_STRENGTHEN_PREFIX_RULES = {
     # 词汇句型课 101
-    ("词汇", "输入-听"):         "再练习一下单词",   # 听懂单词
-    ("词汇", "输出-说"):         "再练习一下单词",   # 说出单词
-    ("词汇", "输入-读"):         "重点练习单词",     # 读出单词
-    ("句型", "输入-听"):         "再挑战一下句型",   # 听懂句子
-    ("句型", "输出-说"):         "再练习一下句型",   # 说出句型（需求文档：再练习一下）
-    ("句型", "交际-说"):         "还需要练习句型",   # 回答问题
+    ("词汇", "输入-听"):         ["再练习一下单词",       "Let's practice the word"],
+    ("词汇", "输出-说"):         ["再练习一下单词",       "Let's practice the word"],
+    ("词汇", "输入-读"):         ["重点练习单词",         "Let's practice the word"],
+    ("句型", "输入-听"):         ["再挑战一下句型",       "Try the sentence again:"],
+    ("句型", "输出-说"):         ["再练习一下句型",       "Try the sentence again:"],
+    ("句型", "交际-说"):         ["还需要练习句型",       "Try to answer questions with"],
     # 字母课 102
-    ("字母", "字母-大小写匹配"): "再练习一下字母",   # 大小写匹配
-    ("字母", "字母-命名"):       "再练习一下字母",   # 命名
-    ("字母", "字母-认读"):       "重点练习一下字母", # 认读（需求文档：重点练习一下）
-    ("字母", "自拼-认读"):       "重点练习一下字母", # 自拼-认读（需求文档：重点练习一下）
-    ("字母代表词", "输入-听"):         "还需要练习单词",   # 字母课代表单词 输入-听
-    ("字母代表词", "输出-说"):         "还需要练习单词",   # 字母课代表单词 输出-说
+    ("字母", "字母-大小写匹配"): ["再练习一下字母",       "Let's practice the letter"],
+    ("字母", "字母-命名"):       ["再练习一下字母",       "Let's practice the letter"],
+    ("字母", "字母-认读"):       ["重点练习一下字母",     "Let's practice the letter"],
+    ("字母", "自拼-认读"):       ["重点练习一下字母",     "Let's practice the letter"],
+    ("字母代表词", "输入-听"):   ["还需要练习单词",       "Try the word again:"],
+    ("字母代表词", "输出-说"):   ["还需要练习单词",       "Try the word again:"],
     # 自拼课 103
-    ("自拼", "自拼-认读"):       "重点练习一下自拼规则",
-    ("自拼代表词", "自拼-拼读"):       "还需要练习单词",   # 代表单词 自拼-拼读
-    ("自拼代表词", "自拼-拼写"):       "还需要练习单词",   # 代表单词 自拼-拼写
-    ("自拼代表词", "输入-听"):         "还需要练习单词",   # 代表单词 输入-听
+    ("自拼", "自拼-认读"):       ["重点练习一下自拼规则", "Let's practice the phonics rule"],
+    ("自拼代表词", "自拼-拼读"): ["还需要练习单词",       "Try the word again:"],
+    ("自拼代表词", "自拼-拼写"): ["还需要练习单词",       "Try the word again:"],
+    ("自拼代表词", "输入-听"):   ["还需要练习单词",       "Try the word again:"],
     # 对话课 105
-    ("对话词汇", "输出-说"):     "再练习一下单词",   # 词汇词组 输出-说
-    ("对话句型", "输出-说"):     "再挑战一下句型",   # 句型 输出-说
-    ("对话句型", "交际-说"):     "还需要练习句型",   # 句型 交际-说
-    ("功能句", "交际-说"):       "还需要练习功能句", # 功能句 交际-说
+    ("对话词汇", "输出-说"):     ["再练习一下单词",       "Let's practice the word"],
+    ("对话句型", "输出-说"):     ["再挑战一下句型",       "Try the sentence again:"],
+    ("对话句型", "交际-说"):     ["还需要练习句型",       "Try the sentence again:"],
+    ("功能句", "交际-说"):       ["还需要练习功能句",     "Try the functional sentence again:"],
     # 阅读课 100
-    ("句型", "输入-听"):         "再练习一下句型",   # 阅读课 句型 输入-听（与词汇课同key，规则相同）
-    ("句型", "输出-说"):         "再挑战一下句型",
-    ("绘本", "输入-读"):         "再来读一下绘本",
+    ("句型", "输入-听"):         ["再练习一下句型",       "Try the sentence again:"],
+    ("句型", "输出-说"):         ["再挑战一下句型",       "Try the sentence again:"],
+    ("绘本", "输入-读"):         ["再来读一下绘本",       "Try to read the story again:"],
 }
 
 GOOD_PERFORMANCE_PREFIX_RULES = {
     # 词汇句型课 101
-    ("词汇", "输入-听"):         "能听懂",         # 词汇 输入-听
-    ("词汇", "输出-说"):         "能说出",         # 词汇 输出-说
-    ("词汇", "输入-读"):         "能读出",         # 词汇 输入-读
-    ("句型", "输入-听"):         "能听懂",         # 句型 输入-听（阅读课同）
-    ("句型", "输出-说"):         "能说出",         # 句型 输出-说（阅读课同）
-    ("句型", "交际-说"):         "能在所学情境中使用", # 句型 交际-说
+    ("词汇", "输入-听"):         ["能听懂",                  "Can understand the word"],
+    ("词汇", "输出-说"):         ["能说出",                  "Can say the word"],
+    ("词汇", "输入-读"):         ["能读出",                  "Can read the word"],
+    ("句型", "输入-听"):         ["能听懂",                  "Can understand the sentence"],
+    ("句型", "输出-说"):         ["能说出",                  "Can say the sentence"],
+    ("句型", "交际-说"):         ["能在所学情境中使用",       "Can use the sentence in learned contexts:"],
     # 字母课 102
-    ("字母", "字母-大小写匹配"): "能匹配大小写",
-    ("字母", "字母-命名"):       "能命名字母",
-    ("字母", "字母-认读"):       "能认读字母",
-    ("字母", "自拼-认读"):       "能认出",             # 字母自拼-认读：能认出"{letter}"的字母音
-    ("字母代表词", "输入-听"):         "能听懂单词",         # 字母课代表单词 输入-听
-    ("字母代表词", "输出-说"):         "能说出单词",         # 字母课代表单词 输出-说
+    ("字母", "字母-大小写匹配"): ["能匹配大小写",            "Can match big and small"],
+    ("字母", "字母-命名"):       ["能命名字母",              "Can name the letter"],
+    ("字母", "字母-认读"):       ["能认读字母",              "Can recognize the letter"],
+    ("字母", "自拼-认读"):       ["能认出",                  "Can recognize the sound of"],
+    ("字母代表词", "输入-听"):   ["能听懂单词",              "Can understand the word"],
+    ("字母代表词", "输出-说"):   ["能说出单词",              "Can say the word"],
     # 自拼课 103
-    ("自拼", "自拼-认读"):       "能认读自拼规则",
-    ("自拼代表词", "自拼-拼读"):       "能拼读出单词",       # 代表单词 自拼-拼读
-    ("自拼代表词", "自拼-拼写"):       "能拼写出单词",       # 代表单词 自拼-拼写
-    ("自拼代表词", "输入-听"):         "能听懂单词",         # 代表单词 输入-听
+    ("自拼", "自拼-认读"):       ["能认读自拼规则",          "Can recognize the phonics rule"],
+    ("自拼代表词", "自拼-拼读"): ["能拼读出单词",            "Can blend the word"],
+    ("自拼代表词", "自拼-拼写"): ["能拼写出单词",            "Can spell the word"],
+    ("自拼代表词", "输入-听"):   ["能听懂单词",              "Can understand the word"],
     # 对话课 105
-    ("对话词汇", "输出-说"):     "能说出",             # 词汇词组 输出-说：能说出"{word}"
-    ("对话句型", "输出-说"):     "能说出",             # 句型 输出-说：能说出"{sentence}"
-    ("对话句型", "交际-说"):     "能在所学情境中使用", # 句型 交际-说
-    ("功能句", "交际-说"):       "能在所学情境使用功能句",
+    ("对话词汇", "输出-说"):     ["能说出",                  "Can say the word"],
+    ("对话句型", "输出-说"):     ["能说出",                  "Can say the sentence"],
+    ("对话句型", "交际-说"):     ["能在所学情境中使用",       "Can use the sentence in learned contexts:"],
+    ("功能句", "交际-说"):       ["能在所学情境使用功能句",   "Can use the functional sentence in learned contexts:"],
     # 阅读课 100
-    ("绘本", "输入-读"):         "能读懂故事",
+    ("绘本", "输入-读"):         ["能读懂故事",              "Can understand the story:"],
 }
 
 
@@ -231,8 +237,8 @@ class ExcelReport:
         headers = [
             "测试文件", "知识类型", "知识点名称", "能力项", "掌握度",
             "归属(good≥3/need≤2)",
-            "预期good_performance", "预期need_strengthen",
-            "实际good_performance", "实际need_strengthen",
+            "预期good_performance", "实际good_performance",
+            "预期need_strengthen", "实际need_strengthen",
             "对比结果"
         ]
         self.ws_detail.append(headers)
@@ -251,7 +257,7 @@ class ExcelReport:
     def add_detail_row(self, filename, kt, kname, ability, mastery,
                        group, exp_good, exp_need, act_good, act_need, match):
         row = [filename, kt, kname, ability, mastery, group,
-               exp_good, exp_need, act_good, act_need, match]
+               exp_good, act_good, exp_need, act_need, match]
         self.ws_detail.append(row)
         result_col = 11
         row_idx = self.ws_detail.max_row
@@ -316,17 +322,17 @@ def _check_fixed_fields(content: dict, checker: Checker):
         else:
             checker.fail(field, actual, f"期望: '{expected}'")
 
-    # good_default / need_default 是列表，校验是否包含期望文案
-    for field, expected_text in [
+    # good_default / need_default 是列表，校验是否包含期望文案（中文或英文任意一条即PASS）
+    for field, expected_texts in [
         ("good_default", EXPECTED_GOOD_DEFAULT),
         ("need_default", EXPECTED_NEED_DEFAULT),
     ]:
         val = content.get(field)
         if isinstance(val, list) and len(val) > 0:
-            if expected_text in val:
+            if any(e in val for e in expected_texts):
                 checker.ok(f"{field} 含期望兜底文案", val)
             else:
-                checker.fail(field, val, f"期望包含: '{expected_text}'")
+                checker.fail(field, val, f"期望包含(任意一个): {expected_texts}")
         else:
             checker.fail(field, val, "列表为空或不是list类型")
 
@@ -391,34 +397,36 @@ def _check_text_prefix(text_list: list, field: str, checker: Checker):
 
     rules = NEED_STRENGTHEN_PREFIX_RULES if field == "need_strengthen" else GOOD_PERFORMANCE_PREFIX_RULES
 
+    # 收集所有已知前缀，按长度降序（优先匹配最长前缀，避免短前缀误命中）
+    all_prefixes_sorted = sorted(
+        set(item for v in rules.values() for item in (v if isinstance(v, list) else [v])),
+        key=len, reverse=True
+    )
+
     for text in text_list:
-        # 提取前缀：去掉最后的 "..." 部分
-        # 格式示例: 再练习一下单词 "spider"
-        m = re.match(r'^(.+?)\s*[""""]', text)
-        if not m:
-            checker.warn(f"{field} 文案格式", text, "无法解析引号前缀，请人工确认")
-            continue
+        # 格式：前缀 + 空格 + 知识点名称，例如 "再练习一下单词 spider"
+        matched_prefix = next(
+            (p for p in all_prefixes_sorted if text.startswith(p + ' ') or text == p),
+            None
+        )
 
-        prefix = m.group(1).strip()
-
-        # 查找该前缀在规则表中是否存在
-        matched_rules = [(kt, ab) for (kt, ab), p in rules.items() if p == prefix]
-
-        if matched_rules:
+        if matched_prefix is not None:
+            matched_rules = [
+                (kt, ab) for (kt, ab), p in rules.items()
+                if (isinstance(p, list) and matched_prefix in p) or p == matched_prefix
+            ]
             checker.ok(
                 f"{field} 文案前缀",
                 text,
-                f"前缀'{prefix}'匹配规则: {matched_rules}"
+                f"前缀'{matched_prefix}'匹配规则: {matched_rules}"
             )
         else:
-            # 判断是否是已知前缀的误写（相似前缀提示）
-            all_prefixes = set(rules.values())
-            similar = [p for p in all_prefixes if prefix[:4] in p or p[:4] in prefix]
-            hint = f"相似前缀: {similar}" if similar else f"所有合法前缀: {sorted(all_prefixes)}"
+            similar = [p for p in all_prefixes_sorted if text[:4] in p or p[:4] in text]
+            hint = f"相似前缀: {similar}" if similar else f"所有合法前缀: {sorted(all_prefixes_sorted)}"
             checker.fail(
                 f"{field} 文案前缀",
                 text,
-                f"前缀'{prefix}'不在规则表中。{hint}"
+                f"前缀不在规则表中。{hint}"
             )
 
 
@@ -515,10 +523,16 @@ def _calc_expected_good_need(points: list) -> tuple:
             candidates_good = []
             for p in pts_max:
                 ability_cn = ABILITY_TYPE_MAP.get(p["ability"], p["ability"])
-                prefix = GOOD_PERFORMANCE_PREFIX_RULES.get((kt_cn, ability_cn))
-                text = f'{prefix} "{p["knowledge_name"]}"' if prefix else f'[未知规则:{kt_cn}/{ability_cn}] "{p["knowledge_name"]}"'
-                if text not in candidates_good:
-                    candidates_good.append(text)
+                prefixes = GOOD_PERFORMANCE_PREFIX_RULES.get((kt_cn, ability_cn))
+                if prefixes is None:
+                    text = f'[未知规则:{kt_cn}/{ability_cn}] {p["knowledge_name"]}'
+                    if text not in candidates_good:
+                        candidates_good.append(text)
+                else:
+                    for pref in (prefixes if isinstance(prefixes, list) else [prefixes]):
+                        text = f'{pref} {p["knowledge_name"]}'
+                        if text not in candidates_good:
+                            candidates_good.append(text)
             if len(candidates_good) == 1:
                 display_good = candidates_good[0]
             else:
@@ -535,10 +549,16 @@ def _calc_expected_good_need(points: list) -> tuple:
             candidates_need = []
             for p in pts_min:
                 ability_cn = ABILITY_TYPE_MAP.get(p["ability"], p["ability"])
-                prefix = NEED_STRENGTHEN_PREFIX_RULES.get((kt_cn, ability_cn))
-                text = f'{prefix} "{p["knowledge_name"]}"' if prefix else f'[未知规则:{kt_cn}/{ability_cn}] "{p["knowledge_name"]}"'
-                if text not in candidates_need:
-                    candidates_need.append(text)
+                prefixes = NEED_STRENGTHEN_PREFIX_RULES.get((kt_cn, ability_cn))
+                if prefixes is None:
+                    text = f'[未知规则:{kt_cn}/{ability_cn}] {p["knowledge_name"]}'
+                    if text not in candidates_need:
+                        candidates_need.append(text)
+                else:
+                    for pref in (prefixes if isinstance(prefixes, list) else [prefixes]):
+                        text = f'{pref} {p["knowledge_name"]}'
+                        if text not in candidates_need:
+                            candidates_need.append(text)
             if len(candidates_need) == 1:
                 display_need = candidates_need[0]
             else:
@@ -662,30 +682,49 @@ def validate_file(filepath: str, report: ExcelReport):
         print(f"  {'知识类型':<10} {'能力项':<16} {'知识点':<20} {'掌握度':<6} {'归属':<8} {'对比'}")
         print(f"  {'─' * 56}")
 
-        for kt_cn, ability_cn, kname, mastery, display_text, group, candidates in selected:
-            group_label = "good(≥3)" if group == "good" else "need(≤2)"
+        # 预计算每行的匹配结果，以便后续排除已命中条目
+        def _compute_matched(candidates, act_list):
+            matched = [t for t in act_list if t in candidates]
+            if not matched:
+                cand_knames = set()
+                for c in candidates:
+                    clean = re.sub(r'["""\u201c\u201d]', '', c)
+                    cand_knames.add(clean.split()[-1] if ' ' in clean else clean)
+                if not cand_knames:
+                    cand_knames = {candidates[0].split()[-1] if candidates else ""}
+                matched = [t for t in act_list if any(kn in t for kn in cand_knames)]
+            return matched
+
+        rows_data = []
+        for entry in selected:
+            kt_cn, ability_cn, kname, mastery, display_text, group, candidates = entry
             act_list = act_good if group == "good" else act_need
-            # 任意候选文案匹配即 PASS
-            act_matched = [t for t in act_list if any(t == c for c in candidates)]
-            # 兜底：候选文案不在规则中时，用知识点名称做模糊匹配
-            if not act_matched:
-                act_matched = [t for t in act_list if kname in t]
+            act_matched = _compute_matched(candidates, act_list)
+            rows_data.append((kt_cn, ability_cn, kname, mastery, display_text, group, candidates, act_list, act_matched))
+
+        # 汇总所有已命中条目
+        globally_matched_good = set(t for *_, group, _, act_list, act_matched in rows_data if group == "good" for t in act_matched)
+        globally_matched_need = set(t for *_, group, _, act_list, act_matched in rows_data if group == "need" for t in act_matched)
+
+        for kt_cn, ability_cn, kname, mastery, display_text, group, candidates, act_list, act_matched in rows_data:
+            group_label = "good(≥3)" if group == "good" else "need(≤2)"
 
             if act_matched:
                 match = "PASS"
                 match_sym = "√"
-                act_str = act_matched[0]
+                act_str = "\n".join(act_matched)
             else:
                 match = "FAIL" if act_list else "WARN"
                 match_sym = "×" if match == "FAIL" else "!"
-                act_str = ""
+                # 展示未被其他行命中的实际条目
+                globally_matched = globally_matched_good if group == "good" else globally_matched_need
+                act_str = "\n".join(t for t in act_list if t not in globally_matched)
 
             print(f"  {kt_cn:<10} {ability_cn:<16} {kname:<20} {mastery:<6} {group_label:<8} {match_sym}")
             print(f"    预期: {display_text}")
             if act_str:
-                print(f"    实际: {act_str}")
-            elif act_list:
-                print(f"    实际: {act_list}（未找到匹配文案）")
+                for line in act_str.split("\n"):
+                    print(f"    实际: {line}")
             else:
                 print(f"    实际: （列表为空）")
 
